@@ -1,0 +1,6 @@
+name: cqts-projects-0.1
+include:
+  cubical
+  .
+depend:
+flags: --cubical 
