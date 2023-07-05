@@ -9,6 +9,7 @@ open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Structures.Auto
 
+
 open import Cubical.Data.Bool hiding (_≤_; _≟_)
 open import Cubical.Data.Nat
 open import Cubical.Data.Nat.Properties
@@ -32,9 +33,25 @@ module _ (A : Type ℓ) (Aset : isSet A) where
  BST : Type (ℓ-suc ℓ)
  BST = TypeWithStr ℓ BSTStructure
 
+-- 1. For any element n, the member function applied to the empty tree should return false.
+-- 2. If we insert an element n into a tree t, then the member function applied to n in the resulting tree should return true.  
+-- 3. If we insert an element m into a tree t and then insert element n (where n is equal to m), the member function applied to n in the resulting tree should return true.  		
+-- 4. If the member function applied to an element n in a tree t returns true, then inserting n into t should still return true. 		
+-- 5.  If the member function applied to an element n in a tree t returns true, then inserting any other element m into t should still return true. 	
+-- 6. If we insert an element m into a tree t and the member function applied to n in the resulting tree returns true, then the member function applied to n in the original tree t should also return true. 
+-- 7. If we insert an element m into a tree t and then insert element n (where n is equal to m), and the member function applied to n in the resulting tree returns true, then inserting m into t should still return true.
+-- 8. If we insert an element m into a tree t and then check for membership of an element n (where n is different from m), it should return the same result as checking membership in the original tree t. [NOT IMPLEMENTED]
+
  BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
  BSTAxioms X (empty , insert , member) = 
-     ∀ n → (member n empty ≡ false) 
+     ∀ n → (member n empty ≡ false) ×
+     (∀ n t → member n (insert n t) ≡ true) ×
+     (∀ n m t → member n (insert m (insert n t)) ≡ true) ×
+     (∀ n t → member n t ≡ true → member n (insert n t) ≡ true) ×
+     (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) ×
+     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true) ×
+     (∀ n m t → member n (insert m (insert n t)) ≡ true → member n (insert m t) ≡ true) 
+    --  (∀ n m t → n ≢ m → member n (insert m t) ≡ member n t) 
 
 -- Naive implementation of BSTs
 
