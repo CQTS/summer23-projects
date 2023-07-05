@@ -44,14 +44,14 @@ module _ (A : Type ℓ) (Aset : isSet A) where
 
  BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
  BSTAxioms X (empty , insert , member) = 
-     ∀ n → (member n empty ≡ false) ×
-     (∀ n t → member n (insert n t) ≡ true) ×
-     (∀ n m t → member n (insert m (insert n t)) ≡ true) ×
-     (∀ n t → member n t ≡ true → member n (insert n t) ≡ true) ×
-     (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) ×
-     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true) ×
-     (∀ n m t → member n (insert m (insert n t)) ≡ true → member n (insert m t) ≡ true) 
-    --  (∀ n m t → n ≢ m → member n (insert m t) ≡ member n t) 
+     ∀ n → (member n empty ≡ false) × -- Empty tree has no members
+     (∀ n t → member n (insert n t) ≡ true) × -- Inserted element is a member
+     (∀ n m t → member n (insert m (insert n t)) ≡ true) × -- Non-inserted element is not affected
+     (∀ n t → member n t ≡ true → member n (insert n t) ≡ true) × -- Inserted elements are members
+     (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) ×  -- Already present member remains a member
+     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true) × -- Membership status unaffected by inserting other elements
+     (∀ n m t → member n (insert m (insert n t)) ≡ true → member n (insert m t) ≡ true) -- Member remains a member after insertion
+    --  (∀ n m t → n ≢ m → member n (insert m t) ≡ member n t) -- Membership status preserved after double insertion
 
 -- Naive implementation of BSTs
 
