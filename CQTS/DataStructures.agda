@@ -11,6 +11,7 @@ open import Cubical.Structures.Auto
 
 open import Cubical.Data.Bool hiding (_≤_; _≟_)
 open import Cubical.Data.Nat
+open import Cubical.Data.Nat.Properties
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sigma
 
@@ -31,6 +32,9 @@ module _ (A : Type ℓ) (Aset : isSet A) where
  BST : Type (ℓ-suc ℓ)
  BST = TypeWithStr ℓ BSTStructure
 
+ BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
+ BSTAxioms X (empty , insert , member) = 
+     ∀ n → (member n empty ≡ false) 
 
 -- Naive implementation of BSTs
 
@@ -56,3 +60,7 @@ member x (node y l r) with x ≟ y
 ... | (lt _) = member x l
 ... | (eq _) = true
 ... | (gt _) = member x r
+
+TreeSet : BST ℕ isSetℕ
+TreeSet = Tree , leaf , insert , member
+
