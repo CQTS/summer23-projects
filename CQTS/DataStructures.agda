@@ -9,6 +9,9 @@ open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Structures.Auto
 
+open import Cubical.Data.Int hiding (sucℤ; _+_)
+open import Cubical.Core.Everything
+
 
 open import Cubical.Data.Bool hiding (_≤_; _≟_)
 open import Cubical.Data.Nat
@@ -81,3 +84,18 @@ member x (node y l r) with x ≟ y
 TreeSet : BST ℕ isSetℕ
 TreeSet = Tree , leaf , insert , member
 
+-- AVL implementation
+-- Data type for AVL trees
+data AVLTree : Set where
+  leaf : AVLTree
+  node : ℕ → ℤ → AVLTree → AVLTree → AVLTree
+
+-- Get the height of an AVL tree
+height : AVLTree → ℤ
+height leaf = 0
+height (node _ h _ _) = h
+
+-- Calculate the balance factor of an AVL tree
+balanceFactor : AVLTree → ℤ
+balanceFactor leaf = 0
+balanceFactor (node _ _ left right) = height right - height left
