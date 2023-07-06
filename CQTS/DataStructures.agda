@@ -41,16 +41,18 @@ module _ (A : Type ℓ) (Aset : isSet A) where
 -- 3. If we insert an element m into a tree t and then insert element n (where n is equal to m), the member function applied to n in the resulting tree should return true. 
 -- 4. If we insert an element m into a tree t and then check for membership of an element n (where n is different from m), it should return the same result as checking membership in the original tree t. 
 
--- For any element m not in the tree t, then the member function applied to m in the resulting tree should return false. 
--- If the member function applied to an element n in a tree t returns true, then inserting n into t should return the same tree. 
---  (∀ n t → member n t ≡ true → t \eq (insert n t)) × -- Inserting duplicate element returns the same tree 
-
+ -- define axioms
  BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
  BSTAxioms X (empty , insert , member) = 
      ∀ n → (member n empty ≡ false) × -- Empty tree has no members
      (∀ n t → member n (insert n t) ≡ true) × -- Inserted element is a member
-     (∀ n m t → member n (insert n (insert m t)) ≡ true) × -- Non-inserted element is not affected
-     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true) × -- Membership status unaffected by inserting other elements
+     (∀ n m t → member n (insert m (insert n t)) ≡ true) × -- Non-inserted element is not affected
+     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true)  -- Membership status unaffected by inserting other elements
+
+
+-- For any element m not in the tree t, then the member function applied to m in the resulting tree should return false. 
+-- If the member function applied to an element n in a tree t returns true, then inserting n into t should return the same tree. 
+--  (∀ n t → member n t ≡ true → t \eq (insert n t)) × -- Inserting duplicate element returns the same tree 
 
 -- Naive implementation of BSTs
 
@@ -68,7 +70,7 @@ insert x (node y l r) with x ≟ y
 ... | (gt _) = node y l (insert x r)
 
 
--- -- Check if an element is in a tree
+-- Check if an element is in a tree
 member : (x : ℕ) → Tree → Bool
 member x leaf = false
 member x (node y l r) with x ≟ y
@@ -94,3 +96,4 @@ height (node _ h _ _) = h
 balanceFactor : AVLTree → ℤ
 balanceFactor leaf = 0
 balanceFactor (node _ _ left right) = height right - height left
+
