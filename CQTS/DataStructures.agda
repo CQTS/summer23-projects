@@ -38,23 +38,19 @@ module _ (A : Type ℓ) (Aset : isSet A) where
 
 -- 1. For any element n, the member function applied to the empty tree should return false.
 -- 2. If we insert an element n into a tree t, then the member function applied to n in the resulting tree should return true.  
--- 3. If we insert an element m into a tree t and then insert element n (where n is equal to m), the member function applied to n in the resulting tree should return true.  		
--- 4. If the member function applied to an element n in a tree t returns true, then inserting n into t should still return true. 		
--- 5.  If the member function applied to an element n in a tree t returns true, then inserting any other element m into t should still return true. 	
--- 6. If we insert an element m into a tree t and the member function applied to n in the resulting tree returns true, then the member function applied to n in the original tree t should also return true. 
--- 7. If we insert an element m into a tree t and then insert element n (where n is equal to m), and the member function applied to n in the resulting tree returns true, then inserting m into t should still return true.
--- 8. If we insert an element m into a tree t and then check for membership of an element n (where n is different from m), it should return the same result as checking membership in the original tree t. [NOT IMPLEMENTED]
+-- 3. If we insert an element m into a tree t and then insert element n (where n is equal to m), the member function applied to n in the resulting tree should return true. 
+-- 4. If we insert an element m into a tree t and then check for membership of an element n (where n is different from m), it should return the same result as checking membership in the original tree t. 
+
+-- For any element m not in the tree t, then the member function applied to m in the resulting tree should return false. 
+-- If the member function applied to an element n in a tree t returns true, then inserting n into t should return the same tree. 
+--  (∀ n t → member n t ≡ true → t \eq (insert n t)) × -- Inserting duplicate element returns the same tree 
 
  BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
  BSTAxioms X (empty , insert , member) = 
      ∀ n → (member n empty ≡ false) × -- Empty tree has no members
      (∀ n t → member n (insert n t) ≡ true) × -- Inserted element is a member
-     (∀ n m t → member n (insert m (insert n t)) ≡ true) × -- Non-inserted element is not affected
-     (∀ n t → member n t ≡ true → member n (insert n t) ≡ true) × -- Inserted elements are members
-     (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) ×  -- Already present member remains a member
+     (∀ n m t → member n (insert n (insert m t)) ≡ true) × -- Non-inserted element is not affected
      (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true) × -- Membership status unaffected by inserting other elements
-     (∀ n m t → member n (insert m (insert n t)) ≡ true → member n (insert m t) ≡ true) -- Member remains a member after insertion
-    --  (∀ n m t → n ≢ m → member n (insert m t) ≡ member n t) -- Membership status preserved after double insertion
 
 -- Naive implementation of BSTs
 
@@ -70,7 +66,6 @@ insert x (node y l r) with x ≟ y
 ... | (lt _) = node y (insert x l) r
 ... | (eq _) = node y l r
 ... | (gt _) = node y l (insert x r)
-
 
 
 -- -- Check if an element is in a tree
