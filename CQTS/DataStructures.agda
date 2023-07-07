@@ -94,10 +94,19 @@ insertedElementIsMember n leaf with n ≟ n
 ... | (lt x) = ⊥.rec (¬m<m x) 
 ... | (eq _) = refl 
 ... | (gt x) = ⊥.rec (¬m<m x) 
-insertedElementIsMember n (node x l r) with n ≟ n 
-... | (lt x) = {!   !} 
-... | (eq _) = {!   !} 
-... | (gt x) = {!   !} 
+insertedElementIsMember n (node m l r) with n ≟ m 
+insertedElementIsMember n (node m l r) | (lt x) with n ≟ m 
+... | (lt y) = insertedElementIsMember n l 
+... | (eq y) = refl 
+... | (gt y) = ⊥.rec (<-asym x (<-weaken y) )  
+insertedElementIsMember n (node m l r) | (eq x) with n ≟ m 
+... | (lt y) = ⊥.rec (<→≢ y x) 
+... | (eq y) = refl 
+... | (gt y) = ⊥.rec (<→≢ y (sym x)) 
+insertedElementIsMember n (node m l r) | (gt x) with n ≟ m 
+... | (lt y) = ⊥.rec (<-asym x (<-weaken y) ) 
+... | (eq y) = refl 
+... | (gt y) = insertedElementIsMember n r 
 
 
 
@@ -117,4 +126,4 @@ balanceFactor : AVLTree → ℤ
 balanceFactor leaf = 0
 balanceFactor (node _ _ left right) = height right - height left
 
- 
+  
