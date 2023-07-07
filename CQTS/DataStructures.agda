@@ -40,7 +40,7 @@ module _ (A : Type ℓ) (Aset : isSet A) where
 
 -- 1. For any element n, the member function applied to the empty tree should return false.
 -- 2. If we insert an element n into a tree t, then the member function applied to n in the resulting tree should return true.  
--- 3. If we insert an element m into a tree t and then insert element n (where n is equal to m), the member function applied to n in the resulting tree should return true. 
+-- 3. If n is a member of a tree and we insert an element m into a tree t, the member function applied to n in the resulting tree should return true. 
 -- 4. If we insert an element m into a tree t and then check for membership of an element n (where n is different from m), it should return the same result as checking membership in the original tree t. 
 
  -- define axioms
@@ -48,7 +48,7 @@ module _ (A : Type ℓ) (Aset : isSet A) where
  BSTAxioms X (empty , insert , member) = 
      ∀ n → (member n empty ≡ false) × -- Empty tree has no members
      (∀ n t → member n (insert n t) ≡ true) × -- Inserted element is a member
-     (∀ n m t → member n (insert m (insert n t)) ≡ true) × -- Non-inserted element is not affected
+     (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) × -- Non-inserted element is not affected
      (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true)  -- Membership status unaffected by inserting other elements
 
 
@@ -126,4 +126,4 @@ balanceFactor : AVLTree → ℤ
 balanceFactor leaf = 0
 balanceFactor (node _ _ left right) = height right - height left
 
-  
+   
