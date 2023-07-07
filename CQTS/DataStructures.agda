@@ -18,6 +18,8 @@ open import Cubical.Data.Nat
 open import Cubical.Data.Nat.Properties
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sigma
+open import Cubical.Data.Empty as ⊥
+
 
 private
   variable
@@ -81,6 +83,24 @@ member x (node y l r) with x ≟ y
 TreeSet : BST ℕ isSetℕ
 TreeSet = Tree , leaf , insert , member
 
+-- prove axioms 
+-- axiom 1 
+emptyTree : (n : ℕ) → member n leaf ≡ false
+emptyTree n = refl 
+
+-- axiom 2
+insertedElementIsMember : (n :  ℕ) ( t : Tree) → member n (insert n t ) ≡ true
+insertedElementIsMember n leaf with n ≟ n
+... | (lt x) = ⊥.rec (¬m<m x) 
+... | (eq _) = refl 
+... | (gt x) = ⊥.rec (¬m<m x) 
+insertedElementIsMember n (node x l r) with n ≟ n 
+... | (lt x) = {!   !} 
+... | (eq _) = {!   !} 
+... | (gt x) = {!   !} 
+
+
+
 -- AVL implementation
 -- Data type for AVL trees
 data AVLTree : Set where
@@ -97,3 +117,4 @@ balanceFactor : AVLTree → ℤ
 balanceFactor leaf = 0
 balanceFactor (node _ _ left right) = height right - height left
 
+ 
