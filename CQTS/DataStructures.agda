@@ -19,6 +19,7 @@ open import Cubical.Data.Nat.Properties
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sigma
 open import Cubical.Data.Empty as ⊥
+open import Cubical.Relation.Nullary
 
 
 private
@@ -49,7 +50,7 @@ module _ (A : Type ℓ) (Aset : isSet A) where
      ∀ n → (member n empty ≡ false) × -- Empty tree has no members
      (∀ n t → member n (insert n t) ≡ true) × -- Inserted element is a member
      (∀ n m t → member n t ≡ true → member n (insert m t) ≡ true) × -- Non-inserted element is not affected
-     (∀ n m t → member n (insert m t) ≡ true → member n t ≡ true)  -- Membership status unaffected by inserting other elements
+     (∀ n m t →  ¬ ( n ≡ m ) → member n (insert m t) ≡ true → member n t ≡ true)  -- Membership status unaffected by inserting other elements
 
 
 -- For any element m not in the tree t, then the member function applied to m in the resulting tree should return false. 
@@ -92,13 +93,13 @@ emptyTree n = refl
 insertedElementIsMember : (n :  ℕ) ( t : Tree) → member n (insert n t ) ≡ true
 insertedElementIsMember n leaf with n ≟ n
 ... | (lt x) = ⊥.rec (¬m<m x) 
-... | (eq _) = refl 
+... | (eq x) = refl 
 ... | (gt x) = ⊥.rec (¬m<m x) 
 insertedElementIsMember n (node m l r) with n ≟ m 
 insertedElementIsMember n (node m l r) | (lt x) with n ≟ m 
 ... | (lt y) = insertedElementIsMember n l 
 ... | (eq y) = refl 
-... | (gt y) = ⊥.rec (<-asym x (<-weaken y) )  
+... | (gt y) = ⊥.rec (<-asym x (<-weaken y) )    
 insertedElementIsMember n (node m l r) | (eq x) with n ≟ m 
 ... | (lt y) = ⊥.rec (<→≢ y x) 
 ... | (eq y) = refl 
@@ -107,6 +108,26 @@ insertedElementIsMember n (node m l r) | (gt x) with n ≟ m
 ... | (lt y) = ⊥.rec (<-asym x (<-weaken y) ) 
 ... | (eq y) = refl 
 ... | (gt y) = insertedElementIsMember n r 
+
+-- axiom 4 
+isMemberAfterInsertion : (n m : ℕ) (t : Tree) → ( ¬ ( n ≡ m ) ) → (member n (insert m t) ≡ true → member n t ≡ true)
+isMemberAfterInsertion n m leaf with n ≟ m
+... | (lt x) = λ p q i → q i 
+... | (eq x) = λ p q i → {!   !} 
+... | (gt x) = λ p q i → q i 
+isMemberAfterInsertion n m (node s l r) neq with m ≟ s 
+isMemberAfterInsertion n m (node s l r) neq | (lt x) with n ≟ s
+... | (lt y) = isMemberAfterInsertion n m l neq 
+... | (eq y) = λ p i → true
+... | (gt y) = λ p i → p i 
+isMemberAfterInsertion n m (node s l r) neq | (eq x) with n ≟ s 
+... | (lt y) = λ p i → p i
+... | (eq y) = λ p i → true
+... | (gt y) = λ p i → p i
+isMemberAfterInsertion n m (node s l r) neq | (gt x) with n ≟ s 
+... | (lt y) = λ p i → p i 
+... | (eq y) = λ p i → true
+... | (gt y) = isMemberAfterInsertion n m r neq 
 
 
 -- RedBlack Tree Implemetation
@@ -147,4 +168,4 @@ insertRB x (Node color left value right) with x ≟ value
 
 RBTreeSet : BST ℕ isSetℕ
 RBTreeSet = RBTree , Empty , insertRB , memberRB
-  
+   
