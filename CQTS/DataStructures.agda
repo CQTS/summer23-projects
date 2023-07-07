@@ -109,21 +109,42 @@ insertedElementIsMember n (node m l r) | (gt x) with n ≟ m
 ... | (gt y) = insertedElementIsMember n r 
 
 
+-- RedBlack Tree Implemetation
+-- Colors of nodes
+data Color : Set where
+  Red : Color
+  Black : Color
 
--- AVL implementation
--- Data type for AVL trees
-data AVLTree : Set where
-  leaf : AVLTree
-  node : ℕ → ℤ → AVLTree → AVLTree → AVLTree
+-- Red-black tree
+data RBTree : Set where
+  Empty : RBTree
+  Node : Color → RBTree → ℕ → RBTree → RBTree
 
--- Get the height of an AVL tree
-height : AVLTree → ℤ
-height leaf = 0
-height (node _ h _ _) = h
+-- Check if an element is in a red-black tree
+memberRB : (x : ℕ) → RBTree → Bool
+memberRB x Empty = false
+memberRB x (Node _ left value right) with x ≟ value
+... | lt _ = memberRB x left
+... | eq _ = true
+... | gt _ = memberRB x right
 
--- Calculate the balance factor of an AVL tree
-balanceFactor : AVLTree → ℤ
-balanceFactor leaf = 0
-balanceFactor (node _ _ left right) = height right - height left
 
-   
+-- Helper function to balance the red-black tree
+balance : Color → RBTree → ℕ → RBTree → RBTree
+balance Black (Node Red (Node Red a x b) y c) z d = Node Red (Node Black a x b) y (Node Black c z d)
+balance Black (Node Red a x (Node Red b y c)) z d = Node Red (Node Black a x b) y (Node Black c z d)
+balance Black a x (Node Red (Node Red b y c) z d) = Node Red (Node Black a x b) y (Node Black c z d)
+balance Black a x (Node Red b y (Node Red c z d)) = Node Red (Node Black a x b) y (Node Black c z d)
+balance color left value right = Node color left value right
+
+-- Insert an element into a red-black tree
+insertRB : (x : ℕ) → RBTree → RBTree
+insertRB x Empty = Node Red Empty x Empty
+insertRB x (Node color left value right) with x ≟ value
+... | (lt _) = balance color (insertRB x left) value right
+... | (eq _) = Node color left value right
+... | (gt _) = balance color left value (insertRB x right)
+
+RBTreeSet : BST ℕ isSetℕ
+RBTreeSet = RBTree , Empty , insertRB , memberRB
+  
