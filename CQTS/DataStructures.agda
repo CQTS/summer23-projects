@@ -109,6 +109,26 @@ insertedElementIsMember n (node m l r) | (gt x) with n ≟ m
 ... | (eq y) = refl 
 ... | (gt y) = insertedElementIsMember n r 
 
+-- axiom 3
+insertPreservesMembership :  (n m : ℕ) (t : Tree) → member n t ≡ true → member n (insert m t) ≡ true -- Non-inserted element is not affected
+insertPreservesMembership n m leaf with n ≟ m
+... | (lt x) = λ y → y
+... | (eq x) = λ y → refl
+... | (gt x) = λ y → y
+insertPreservesMembership n m (node x l r) with m ≟ x  
+insertPreservesMembership n m (node x l r) | (lt z) with n ≟ x
+... | (lt y) = insertPreservesMembership n m l 
+... | (eq y) = λ p i → true 
+... | (gt y) = λ p i → p i 
+insertPreservesMembership n m (node x l r) | (eq z) with n ≟ x 
+... | (lt y) = λ p i → p i 
+... | (eq y) = λ p i → true
+... | (gt y) = λ p i → p i  
+insertPreservesMembership n m (node x l r) | (gt z) with n ≟ x 
+... | (lt y) = λ p i → p i 
+... | (eq y) = λ p i → true
+... | (gt y) = insertPreservesMembership n m r 
+
 -- axiom 4 
 isMemberAfterInsertion : (n m : ℕ) (t : Tree) → ( ¬ ( n ≡ m ) ) → (member n (insert m t) ≡ true → member n t ≡ true)
 isMemberAfterInsertion n m leaf with n ≟ m
@@ -168,4 +188,3 @@ insertRB x (Node color left value right) with x ≟ value
 
 RBTreeSet : BST ℕ isSetℕ
 RBTreeSet = RBTree , Empty , insertRB , memberRB
-   
