@@ -133,7 +133,7 @@ insertPreservesMembership n m (node x l r) | (gt z) with n ≟ x
 isMemberAfterInsertion : (n m : ℕ) (t : Tree) → ( ¬ ( n ≡ m ) ) → (member n (insert m t) ≡ true → member n t ≡ true)
 isMemberAfterInsertion n m leaf with n ≟ m
 ... | (lt x) = λ p q i → q i 
-... | (eq x) = λ p q i → {!   !} 
+... | (eq x) =  λ p q → ⊥.rec (p x) 
 ... | (gt x) = λ p q i → q i 
 isMemberAfterInsertion n m (node s l r) neq with m ≟ s 
 isMemberAfterInsertion n m (node s l r) neq | (lt x) with n ≟ s
