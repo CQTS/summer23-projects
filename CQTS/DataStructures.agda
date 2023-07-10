@@ -169,7 +169,6 @@ memberRB x (Node _ left value right) with x ≟ value
 ... | eq _ = true
 ... | gt _ = memberRB x right
 
-
 -- Helper function to balance the red-black tree
 balance : Color → RBTree → ℕ → RBTree → RBTree
 balance Black (Node Red (Node Red a x b) y c) z d = Node Red (Node Black a x b) y (Node Black c z d)
@@ -178,13 +177,54 @@ balance Black a x (Node Red (Node Red b y c) z d) = Node Red (Node Black a x b) 
 balance Black a x (Node Red b y (Node Red c z d)) = Node Red (Node Black a x b) y (Node Black c z d)
 balance color left value right = Node color left value right
 
--- Insert an element into a red-black tree
-insertRB : (x : ℕ) → RBTree → RBTree
-insertRB x Empty = Node Red Empty x Empty
-insertRB x (Node color left value right) with x ≟ value
-... | (lt _) = balance color (insertRB x left) value right
+-- Helper function for insert
+ins : (x : ℕ) → RBTree → RBTree
+ins x Empty = Node Red Empty x Empty
+ins x (Node color left value right) with x ≟ value
+... | (lt _) = balance color (ins x left) value right
 ... | (eq _) = Node color left value right
-... | (gt _) = balance color left value (insertRB x right)
+... | (gt _) = balance color left value (ins x right)
+
+-- helper function to blacken root
+blackenRoot : RBTree → RBTree
+blackenRoot Empty = Empty
+blackenRoot (Node color l x r) = Node Black l x r
+
+-- Insert an element into a red-black tree
+insertRB : ((x : ℕ) → RBTree → RBTree)
+insertRB x t = blackenRoot (ins x t) 
+
+mergeRB : RBTree → RBTree → RBTree
+mergeRB t1 Empty = {!   !}
+mergeRB t1 (Node col t2 x t3) = Node {!   !} (mergeRB t1 t2) x t3
 
 RBTreeSet : BST ℕ isSetℕ
 RBTreeSet = RBTree , Empty , insertRB , memberRB
+
+-- transfer proofs of axioms   
+
+-- define relation 
+R : Tree → RBTree → Type 
+R nt rbt = ∀ n → member n nt ≡ memberRB n rbt
+
+-- function from naive tree to red-black tree
+φ : Tree → RBTree 
+φ leaf = Empty
+-- φ (node x leaf leaf) = Node Red Empty x Empty
+-- φ (node x t1 t2) = insertRB x (mergeRB t1 t2)
+φ (node x leaf leaf) = insertRB x Empty
+-- check this case (adding x?)
+φ (node x leaf (node x₁ right right₁)) = insertRB x ((Node _ Empty x (φ (node x₁ right right₁ )) ))
+φ (node x (node x₁ left left₁) leaf) = {!   !}
+φ (node x (node x₁ left left₁) (node x₂ right right₁)) = {!   !} 
+
+
+-- function from red-black tree to naive tree
+ψ : RBTree → Tree
+ψ Empty = leaf
+ψ (Node color Empty x Empty) = node x leaf leaf
+ψ (Node color Empty x (Node color1 right x₂ right₁)) = node x leaf (ψ (Node color1 right x₂ right₁))
+ψ (Node color (Node color2 left x₂ left₁) x Empty) = node x (ψ (Node color2 left x₂ left₁)) leaf
+ψ (Node color (Node color3 left x₂ left₁) x (Node x₃ right x₄ right₁)) = node x (ψ (Node color3 left x₂ left₁))  (ψ (Node x₃ right x₄ right₁)) 
+
+
