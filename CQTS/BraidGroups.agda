@@ -11,6 +11,8 @@ open import Cubical.Data.Fin
 open import Cubical.Data.Nat using (ℕ ; zero ; suc ; _+_ ; znots)
 open import Cubical.Data.Nat.Order
 
+open import Cubical.Foundations.SIP
+open import Cubical.Structures.Pointed
 
 
 data Bouquet3 : Type where 
@@ -64,6 +66,42 @@ encodeDecodeAG (suc (suc n)) (loop (suc zero , p) i) j = loop (suc zero , isProp
 encodeDecodeAG (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
 
+-- New Automorphism
+
+automorphismGen : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
+automorphismGen zero b = base
+automorphismGen (suc zero) b = b
+automorphismGen (suc (suc n)) base = base
+automorphismGen (suc (suc n)) (loop (zero , p) i) = (loop (zero , suc-≤-suc (≤-suc zero-≤)) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) ∙ sym (loop (zero , suc-≤-suc (≤-suc zero-≤)))) i
+automorphismGen (suc (suc n)) (loop (suc zero , p) i) = loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) i
+automorphismGen (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
+
+
+-- Inverse of automorphism
+-- y1 -> y2 = x1
+-- y2 -> y-2 y1 y2 = x-1 x1x2x-1 x1
+-- yi -> yi 
+automorphismGenInv : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
+automorphismGenInv zero b = base
+automorphismGenInv (suc zero) b = b
+automorphismGenInv (suc (suc n)) base = base
+automorphismGenInv (suc (suc n)) (loop (zero , _) i) = loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) i
+automorphismGenInv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )) )) ∙ loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )))) i
+automorphismGenInv (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
+
+
+encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
+encodeDecodeAutomorph zero base = refl
+encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
+  where lemma : Square refl refl refl (loop (x , p)) 
+        lemma = ⊥.rec (¬-<-zero p) 
+encodeDecodeAutomorph (suc zero) b = refl
+encodeDecodeAutomorph (suc (suc n)) base = refl
+encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) j = {!   !}
+encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i)  = {!   !}
+encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
+
+
 
 MyIsomoprh : (n : ℕ) → Iso (Bouquet (Fin n)) (Bouquet (Fin n))
 Iso.fun (MyIsomoprh n) = automorphGeneral n 
@@ -71,4 +109,18 @@ Iso.inv (MyIsomoprh n) = automorphGeneral n
 Iso.rightInv (MyIsomoprh n) = encodeDecodeAG n
 Iso.leftInv (MyIsomoprh n) = encodeDecodeAG n
     
- 
+-- Proof that MyIsomoprh is an equivalence
+MyIsomoprhEquiv : (n : ℕ) → (Bouquet (Fin n)) ≃ (Bouquet (Fin n))
+MyIsomoprhEquiv n =  isoToEquiv (MyIsomoprh n)
+
+BouquetStr : (n : ℕ) → TypeWithStr _ PointedStructure
+BouquetStr n = Bouquet (Fin n) , base
+
+MyIsomoprhPtdEquiv : (n : ℕ) → BouquetStr n ≃[ PointedEquivStr ] BouquetStr n
+fst (MyIsomoprhPtdEquiv n) = MyIsomoprhEquiv n
+snd (MyIsomoprhPtdEquiv zero) = refl
+snd (MyIsomoprhPtdEquiv (suc zero)) = refl
+snd (MyIsomoprhPtdEquiv (suc (suc n))) = refl
+
+MyIsomorphPtdPath : (n : ℕ) → BouquetStr n ≡ BouquetStr n
+MyIsomorphPtdPath n = pointed-sip (BouquetStr n) (BouquetStr n) (MyIsomoprhPtdEquiv n)
