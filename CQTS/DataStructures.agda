@@ -12,14 +12,15 @@ open import Cubical.Structures.Auto
 open import Cubical.Data.Int hiding (sucℤ; _+_)
 open import Cubical.Core.Everything
 
-
-open import Cubical.Data.Bool hiding (_≤_; _≟_)
+open import Cubical.Data.Bool hiding (_≤_; _≟_; _≥_)
 open import Cubical.Data.Nat
 open import Cubical.Data.Nat.Properties
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sigma
 open import Cubical.Data.Empty as ⊥
 open import Cubical.Relation.Nullary
+open import Cubical.Structures.Macro
+open import Cubical.Structures.Axioms
 
 
 private
@@ -57,20 +58,25 @@ module _ (A : Type ℓ) (Aset : isSet A) where
 -- If the member function applied to an element n in a tree t returns true, then inserting n into t should return the same tree. 
 --  (∀ n t → member n t ≡ true → t \eq (insert n t)) × -- Inserting duplicate element returns the same tree 
 
+private
+  variable
+   ℓ : Level
+
+
 -- Naive implementation of BSTs
 
--- Data type
-data Tree : Set where
-  leaf : Tree
-  node : ℕ → Tree → Tree → Tree
+-- -- Data type
+-- data Tree : Set where
+--   leaf : Tree
+--   node : ℕ → Tree → Tree → Tree
 
--- Insert an element into a tree
-insert : (x : ℕ) → Tree → Tree
-insert x leaf = node x leaf leaf
-insert x (node y l r) with x ≟ y
-... | (lt _) = node y (insert x l) r
-... | (eq _) = node y l r
-... | (gt _) = node y l (insert x r)
+-- -- -- Check if an element is in a tree
+-- search : (x : ℕ) → Tree → Bool
+-- search x leaf = false
+-- search x (node y l r) with x ≟ y
+-- ... | (lt _) = search x l
+-- ... | (eq _) = true
+-- ... | (gt _) = search x r
 
 
 -- Check if an element is in a tree
@@ -81,8 +87,8 @@ member x (node y l r) with x ≟ y
 ... | (eq _) = true
 ... | (gt _) = member x r
 
-TreeSet : BST ℕ isSetℕ
-TreeSet = Tree , leaf , insert , member
+--   BSTStructure : Type ℓ → Type ℓ
+--   BSTStructure X = X × (A → X → X) × (A → X → Bool)
 
 -- prove axioms 
 -- axiom 1 
@@ -228,3 +234,64 @@ R nt rbt = ∀ n → member n nt ≡ memberRB n rbt
 ψ (Node color (Node color3 left x₂ left₁) x (Node x₃ right x₄ right₁)) = node x (ψ (Node color3 left x₂ left₁))  (ψ (Node x₃ right x₄ right₁)) 
 
 
+--   BSTEquivStr = AutoEquivStr BSTStructure
+
+--   BSTUnivalentStr : UnivalentStr _ BSTEquivStr
+--   BSTUnivalentStr = autoUnivalentStr BSTStructure
+
+--   BST : Type (ℓ-suc ℓ)
+--   BST = TypeWithStr ℓ BSTStructure
+
+--   BSTAxioms : (X : Type ℓ) → BSTStructure X → Type ℓ
+--   BSTAxioms X (empty , insert , search) = 
+--       ∀ n → (search n empty ≡ false)
+--     × (∀ x t → search x (insert x t) ≡ true)      -- insert preserves searchship
+
+
+-- TreeSet : BST ℕ isSetℕ
+-- TreeSet = Tree , leaf , insert , search
+
+
+module BST-on (A : Type ℓ) (Aset : isSet A) where
+-- Our BST structure has three main components, the empty Tree, an insert function and a search function
+
+  rawBSTDesc =
+    autoDesc (λ (X : Type ℓ) → X × (A → X → X) × (A → X → Bool)) 
+  
+  open Macro ℓ rawBSTDesc public renaming
+    ( structure to RawBSTStructure
+    ; equiv to RawBSTEquivStr
+    ; univalent to rawBSTUnivalentStr
+    )
+
+  RawBST : Type (ℓ-suc ℓ)
+  RawBST = TypeWithStr ℓ RawBSTStructure
+
+  BSTAxioms : (X : Type ℓ) → RawBSTStructure X → Type ℓ
+  BSTAxioms X S@(empty , insert , search) = 
+      (isSet X)
+    × (∀ n → (search n empty ≡ false))            -- searching empty tree always fails
+    × (∀ x t → search x (insert x t) ≡ true)      -- insert preserves membership
+
+  isPropBSTAxioms : ∀ X S → isProp (BSTAxioms X S)
+  isPropBSTAxioms X (empty , insert , search) =
+    isPropΣ isPropIsSet
+      (λ XSet → isProp× (isPropΠ λ n → isSetBool (search n empty) false) 
+                        (isPropΠ2 λ x t → isSetBool (search x (insert x t)) true)
+      )
+      
+
+  BSTStructure : Type ℓ → Type ℓ
+  BSTStructure = AxiomsStructure RawBSTStructure BSTAxioms
+
+  BST : Type (ℓ-suc ℓ)
+  BST = TypeWithStr ℓ BSTStructure
+
+  BSTEquivStr : StrEquiv BSTStructure ℓ
+  BSTEquivStr = AxiomsEquivStr RawBSTEquivStr BSTAxioms
+
+  bstUnivalentStr : UnivalentStr BSTStructure BSTEquivStr
+  bstUnivalentStr = axiomsUnivalentStr RawBSTEquivStr isPropBSTAxioms rawBSTUnivalentStr
+
+
+  
