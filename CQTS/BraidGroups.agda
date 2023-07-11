@@ -13,7 +13,11 @@ open import Cubical.Data.Nat.Order
 
 open import Cubical.Foundations.SIP
 open import Cubical.Structures.Pointed
+open import Cubical.HITs.S1.Base
 
+private
+  variable
+    ℓ : Level
 
 data Bouquet3 : Type where 
   base : Bouquet3
@@ -98,7 +102,7 @@ encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
         lemma = ⊥.rec (¬-<-zero p) 
 encodeDecodeAutomorph (suc zero) b = refl
 encodeDecodeAutomorph (suc (suc n)) base = refl
-encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!   !}
+encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!  !}
 encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
 encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
@@ -125,3 +129,21 @@ snd (MyIsomoprhPtdEquiv (suc (suc n))) = refl
 
 MyIsomorphPtdPath : (n : ℕ) → BouquetStr n ≡ BouquetStr n
 MyIsomorphPtdPath n = pointed-sip (BouquetStr n) (BouquetStr n) (MyIsomoprhPtdEquiv n)
+
+circleHelper : (k : ℕ) →  (n : ℕ) →  S¹ → Bouquet (Fin n)
+circleHelper k zero s = base
+circleHelper k (suc zero) base = base
+circleHelper k (suc zero) (loop i) = loop (zero , ≤-refl) i
+circleHelper zero (suc (suc n)) base = base
+circleHelper zero (suc (suc n)) (loop i) = loop (zero , (suc-≤-suc (≤-suc zero-≤))) i
+circleHelper (suc k) (suc (suc n)) base = base
+circleHelper (suc k) (suc (suc n)) (loop i) = ( {! circleHelper ? ? ? !} ∙ loop (suc k , {!   !})) i
+
+-- (circleHelper k (suc (suc n)) (loop i))
+
+circMap : (n : ℕ) →  S¹ → Bouquet (Fin n)
+circMap n s = circleHelper n n s
+
+BouquetCircStr : (n : ℕ) → TypeWithStr {! ℓ !} {!   !} 
+BouquetCircStr n = Bouquet (Fin n) , circMap
+
