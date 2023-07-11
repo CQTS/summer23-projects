@@ -7,6 +7,8 @@ open import Cubical.Data.Empty as ⊥
 
 open import Cubical.Algebra.Group
 open import Cubical.HITs.Bouquet
+open import Cubical.HITs.S1
+
 open import Cubical.Data.Fin
 open import Cubical.Data.Nat using (ℕ ; zero ; suc ; _+_ ; znots)
 open import Cubical.Data.Nat.Order
@@ -144,6 +146,15 @@ circleHelper (suc k) (suc (suc n)) (loop i) = ( {! circleHelper ? ? ? !} ∙ loo
 circMap : (n : ℕ) →  S¹ → Bouquet (Fin n)
 circMap n s = circleHelper n n s
 
-BouquetCircStr : (n : ℕ) → TypeWithStr {! ℓ !} {!   !} 
-BouquetCircStr n = Bouquet (Fin n) , circMap
+-- Defining a circle structure
+CircleStructure :  Type → Type 
+CircleStructure A = {!   !}
 
+-- CircleEquivStr : StrEquiv CircleStructure 
+-- CircleEquivStr A B f = ?
+
+-- CircleUnivalentStr :  
+-- CircleUnivalentStr f =  ?
+
+BouquetCircStr : (n : ℕ) → TypeWithStr _ {! CircleStructure !}
+BouquetCircStr n = Bouquet (Fin n) , circMap
