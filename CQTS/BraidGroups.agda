@@ -89,6 +89,7 @@ automorphismGenInv (suc (suc n)) (loop (zero , _) i) = loop (suc zero , suc-≤-
 automorphismGenInv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )) )) ∙ loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )))) i
 automorphismGenInv (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
 
+-- hardCase : cong automorphismGen n (cong automorphismGen n ())
 
 encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
 encodeDecodeAutomorph zero base = refl
@@ -97,8 +98,8 @@ encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
         lemma = ⊥.rec (¬-<-zero p) 
 encodeDecodeAutomorph (suc zero) b = refl
 encodeDecodeAutomorph (suc (suc n)) base = refl
-encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) j = {!   !}
-encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i)  = {!   !}
+encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!   !}
+encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
 encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
 
