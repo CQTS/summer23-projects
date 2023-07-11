@@ -148,13 +148,12 @@ circMap n s = circleHelper n n s
 
 -- Defining a circle structure
 CircleStructure :  Type → Type 
-CircleStructure A = {!   !}
+CircleStructure A = Σ (n : ℕ) (f : S¹ → Bouquet A) , (f ≡ circMap n)
+-- CircleEquivStr : {!   !}
+-- CircleEquivStr A B f = {!   !}
 
--- CircleEquivStr : StrEquiv CircleStructure 
--- CircleEquivStr A B f = ?
+-- CircleUnivalentStr :  {!   !}
+-- CircleUnivalentStr f =  {!   !}
 
--- CircleUnivalentStr :  
--- CircleUnivalentStr f =  ?
-
-BouquetCircStr : (n : ℕ) → TypeWithStr _ {! CircleStructure !}
-BouquetCircStr n = Bouquet (Fin n) , circMap
+BouquetCircStr : (n : ℕ) → TypeWithStr _ CircleStructure
+BouquetCircStr n = Bouquet (Fin n) , circMap n 
