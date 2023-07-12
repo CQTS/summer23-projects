@@ -57,6 +57,34 @@ aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5
 anRBTree : RBTree
 anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
 
+ε' : R (ψ Empty) Empty
+ε' = λ n → refl
+
+helper' : (color : Color) → (left right : RBTree) → (x : ℕ) → (n : ℕ) → member n (ψ (Node color left x right)) ≡ memberRB n (Node color left x right)
+helper' color Empty Empty x n with n ≟ x
+... | lt z = refl
+... | eq z = refl
+... | gt z = refl
+helper' color Empty (Node color₁ right x₂ right₁) x n with n ≟ x
+... | (lt z) = refl
+... | (eq z) = refl
+... | (gt z) = helper' color₁ right right₁ x₂ n
+helper' color (Node color₁ left x₂ left₁) Empty x n with n ≟ x
+... | (lt z) = helper' color₁ left left₁ x₂ n
+... | (eq z) = refl
+... | (gt z) = refl
+helper' color (Node color₁ left x₂ left₁) (Node color₂ right x₄ right₁) x n with n ≟ x
+... | (lt z) = helper' color₁ left left₁ x₂ n
+... | (eq z) = refl
+... | (gt z) = helper' color₂ right right₁ x₄ n
+
+ε'' : (color : Color) → (left right : RBTree) → (x : ℕ) → R (ψ left) left → R (ψ right) right → R (ψ (Node color left x right)) (Node color left x right)
+ε'' color left right x R_left R_right n = helper' color left right x n
+
+ε : ∀ y → R (ψ y) y
+ε Empty = ε'
+ε (Node color left x right) = ε'' color left right x (ε left) (ε right)
+
 helper : (left right : NaiveBST) → (x : ℕ) → (n : ℕ) → member n (node x left right) ≡ memberRB n (φ (node x left right))
 helper t1 leaf x n with n ≟ x
 ... | lt y = {!   !}
@@ -74,7 +102,3 @@ helper t1 (node x₂ right right₁) x n with n ≟ x
 η : ∀ xs → R xs (φ xs)
 η leaf = λ n → refl
 η (node x left right) = η' left right x (η left) (η right)
-
--- ε : ∀ y → R (ψ y) y
--- ε Empty p = refl 
--- ε (Node color l x r) = {!   !} 
