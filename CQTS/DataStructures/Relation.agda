@@ -59,9 +59,6 @@ aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5
 anRBTree : RBTree
 anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
 
-ε' : R (ψ Empty) Empty
-ε' = λ n → refl
-
 -- prove relations 
 
 helper' : (color : Color) → (left right : RBTree) → (x : ℕ) → (n : ℕ) → member n (ψ (Node color left x right)) ≡ memberRB n (Node color left x right)
@@ -106,6 +103,8 @@ helper t1 (node x₂ right right₁) x n with n ≟ x
 η : ∀ xs → R xs (φ xs)
 η leaf = λ n → refl
 η (node x left right) = η' left right x (η left) (η right)
+
+
 
 open isQuasiEquivRel
 
