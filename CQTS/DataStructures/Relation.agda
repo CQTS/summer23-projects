@@ -11,6 +11,15 @@ open import CQTS.DataStructures.NaiveBST
 open import CQTS.DataStructures.RBTrees
 open import CQTS.DataStructures
 
+open import Cubical.Structures.Auto
+
+open import Cubical.Data.Bool hiding (_≤_; _≟_)
+open import Cubical.Data.Nat
+open import Cubical.Data.Nat.Properties
+open import Cubical.Data.Nat.Order
+open import Cubical.Data.Sigma
+open import Cubical.Data.Empty as ⊥
+open import Cubical.Relation.Nullary
 
 
 open RBTrees
@@ -47,6 +56,24 @@ aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5
 -- test example for ψ
 anRBTree : RBTree
 anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
+
+helper : (left right : NaiveBST) → (x : ℕ) → (n : ℕ) → member n (node x left right) ≡ memberRB n (φ (node x left right))
+helper t1 leaf x n with n ≟ x
+... | lt y = {!   !}
+... | eq y = {!   !}
+... | gt y = {!   !}
+helper t1 (node x₂ right right₁) x n with n ≟ x
+... | lt y = {!   !}
+... | eq y = {!   !}
+... | gt y = {!   !}
+
+
+η' : (left right : NaiveBST) → (x : ℕ) → R left (φ left) → R right (φ right) → R (node x left right) (φ (node x left right))
+η' left right x R_left R_right = {!  !}
+
+η : ∀ xs → R xs (φ xs)
+η leaf = λ n → refl
+η (node x left right) = η' left right x (η left) (η right)
 
 -- ε : ∀ y → R (ψ y) y
 -- ε Empty p = refl 
