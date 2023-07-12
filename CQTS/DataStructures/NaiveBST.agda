@@ -49,8 +49,9 @@ module BSTNaiveBST where
   Raw : RawBST 
   Raw = NaiveBST , leaf , insert , member
 
-  WithLaws : BST
-  WithLaws = NaiveBST , S , isSetNaiveBST , emptyNaiveBST , insertedElementIsMember , insertPreservesMembership , isMemberAfterInsertion
+  NaiveWithLaws : BST
+  NaiveWithLaws = NaiveBST , S , isSetNaiveBST , emptyNaiveBST , 
+    insertedElementIsMember , insertPreservesMembership , isMemberAfterInsertion
     where 
       S = str Raw
 
@@ -137,7 +138,6 @@ module BSTNaiveBST where
       ... | (eq y) = refl 
       ... | (gt y) = insertedElementIsMember n r
 
-
       -- axiom 3
       insertPreservesMembership :  (n m : ℕ) (t : NaiveBST) → member n t ≡ true → member n (insert m t) ≡ true -- Non-inserted element is not affected
       insertPreservesMembership n m leaf with n ≟ m
@@ -177,5 +177,3 @@ module BSTNaiveBST where
       ... | (lt y) = λ p i → p i 
       ... | (eq y) = λ p i → true
       ... | (gt y) = isMemberAfterInsertion n m r neq
-
-  

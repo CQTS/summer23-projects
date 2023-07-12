@@ -22,53 +22,61 @@ open import Cubical.Relation.Nullary
 open import Cubical.Structures.Macro
 open import Cubical.Structures.Axioms
 
--- RedBlack Tree Implemetation
+open import CQTS.DataStructures
+
+
 -- Colors of nodes
 data Color : Set where
   Red : Color
   Black : Color
 
--- Red-black tree
-data RBTree : Set where
-  Empty : RBTree
-  Node : Color → RBTree → ℕ → RBTree → RBTree
+module RBTrees where
+  open BST-on ℕ isSetℕ
 
--- Check if an element is in a red-black tree
-memberRB : (x : ℕ) → RBTree → Bool
-memberRB x Empty = false
-memberRB x (Node _ left value right) with x ≟ value
-... | lt _ = memberRB x left
-... | eq _ = true
-... | gt _ = memberRB x right
+  -- Red-black tree
+  data RBTree : Set where
+    Empty : RBTree
+    Node : Color → RBTree → ℕ → RBTree → RBTree
 
--- Helper function to balance the red-black tree
-balance : Color → RBTree → ℕ → RBTree → RBTree
-balance Black (Node Red (Node Red a x b) y c) z d = Node Red (Node Black a x b) y (Node Black c z d)
-balance Black (Node Red a x (Node Red b y c)) z d = Node Red (Node Black a x b) y (Node Black c z d)
-balance Black a x (Node Red (Node Red b y c) z d) = Node Red (Node Black a x b) y (Node Black c z d)
-balance Black a x (Node Red b y (Node Red c z d)) = Node Red (Node Black a x b) y (Node Black c z d)
-balance color left value right = Node color left value right
+  -- Check if an element is in a red-black tree
+  memberRB : (x : ℕ) → RBTree → Bool
+  memberRB x Empty = false
+  memberRB x (Node _ left value right) with x ≟ value
+  ... | lt _ = memberRB x left
+  ... | eq _ = true
+  ... | gt _ = memberRB x right
 
--- Helper function for insert
-ins : (x : ℕ) → RBTree → RBTree
-ins x Empty = Node Red Empty x Empty
-ins x (Node color left value right) with x ≟ value
-... | (lt _) = balance color (ins x left) value right
-... | (eq _) = Node color left value right
-... | (gt _) = balance color left value (ins x right)
+  -- Helper function to balance the red-black tree
+  balance : Color → RBTree → ℕ → RBTree → RBTree
+  balance Black (Node Red (Node Red a x b) y c) z d = Node Red (Node Black a x b) y (Node Black c z d)
+  balance Black (Node Red a x (Node Red b y c)) z d = Node Red (Node Black a x b) y (Node Black c z d)
+  balance Black a x (Node Red (Node Red b y c) z d) = Node Red (Node Black a x b) y (Node Black c z d)
+  balance Black a x (Node Red b y (Node Red c z d)) = Node Red (Node Black a x b) y (Node Black c z d)
+  balance color left value right = Node color left value right
 
--- helper function to blacken root
-blackenRoot : RBTree → RBTree
-blackenRoot Empty = Empty
-blackenRoot (Node color l x r) = Node Black l x r
+  -- Helper function for insert
+  ins : (x : ℕ) → RBTree → RBTree
+  ins x Empty = Node Red Empty x Empty
+  ins x (Node color left value right) with x ≟ value
+  ... | (lt _) = balance color (ins x left) value right
+  ... | (eq _) = Node color left value right
+  ... | (gt _) = balance color left value (ins x right)
 
--- Insert an element into a red-black tree
-insertRB : ((x : ℕ) → RBTree → RBTree)
-insertRB x t = blackenRoot (ins x t) 
+  -- helper function to make sure root is black
+  blackenRoot : RBTree → RBTree
+  blackenRoot Empty = Empty
+  blackenRoot (Node color l x r) = Node Black l x r
 
-mergeRB : RBTree → RBTree → RBTree
-mergeRB t1 Empty = {!   !}
-mergeRB t1 (Node col t2 x t3) = Node {!   !} (mergeRB t1 t2) x t3
+  -- Insert an element into a red-black tree
+  insertRB : ((x : ℕ) → RBTree → RBTree)
+  insertRB x t = blackenRoot (ins x t)
 
-RBTreeSet : BST ℕ isSetℕ
-RBTreeSet = RBTree , Empty , insertRB , memberRB
+  -- helper merge function 
+  mergeRB : RBTree → RBTree → RBTree
+  mergeRB t1 Empty = t1
+  mergeRB t1 (Node col t2 x t3) = mergeRB (insertRB x (mergeRB t1 t2)) t3
+
+  RawRBTree : RawBST
+  RawRBTree = RBTree , Empty , insertRB , memberRB
+
+  
