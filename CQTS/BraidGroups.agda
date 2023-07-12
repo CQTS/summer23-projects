@@ -10,8 +10,9 @@ open import Cubical.HITs.Bouquet
 open import Cubical.HITs.S1
 
 open import Cubical.Data.Fin
-open import Cubical.Data.Nat using (ℕ ; zero ; suc ; _+_ ; znots)
+open import Cubical.Data.Nat using (ℕ ; zero ; suc ; _+_ ; znots; predℕ)
 open import Cubical.Data.Nat.Order
+open import Cubical.Data.FinData.Base using(predFin)
 
 open import Cubical.Foundations.SIP
 open import Cubical.Structures.Pointed
@@ -20,33 +21,6 @@ open import Cubical.HITs.S1.Base
 private
   variable
     ℓ : Level
-
-data Bouquet3 : Type where 
-  base : Bouquet3
-  loop1 : base ≡ base
-  loop2 : base ≡ base
-  loop3 : base ≡ base 
-
-automorph : Bouquet3 → Bouquet3
-automorph base = base
-automorph (loop1 i) = (loop1 ∙ loop2 ∙ loop3 ∙ (sym loop2) ∙ (sym loop1)) i
-automorph (loop2 i) = loop2 i
-automorph (loop3 i) = (sym loop2 ∙ loop1 ∙ loop2) i
-
-
-data ThreeThings : Type where
-  x1 : ThreeThings
-  x2 : ThreeThings
-  x3 : ThreeThings
-
-BouquetNew = Bouquet ThreeThings
-automorphnew : BouquetNew → BouquetNew
-
-automorphnew base = base
-automorphnew (loop x1 i) = (loop x1 ∙ loop x2 ∙ loop x3 ∙ sym (loop x2) ∙ sym (loop x3)) i
-automorphnew (loop x2 i) = loop x2 i
-automorphnew (loop x3 i) = (sym (loop x2) ∙ loop x1 ∙ loop x2) i
-
 
 
 automorphGeneral : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
@@ -74,6 +48,10 @@ encodeDecodeAG (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
 -- New Automorphism
 
+-- x1 -> x1 x2 x1_1
+-- x2 -> x1
+-- xi -> xi
+
 automorphismGen : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
 automorphismGen zero b = base
 automorphismGen (suc zero) b = b
@@ -97,16 +75,16 @@ automorphismGenInv (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x)
 
 -- hardCase : cong automorphismGen n (cong automorphismGen n ())
 
-encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
-encodeDecodeAutomorph zero base = refl
-encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
-  where lemma : Square refl refl refl (loop (x , p)) 
-        lemma = ⊥.rec (¬-<-zero p) 
-encodeDecodeAutomorph (suc zero) b = refl
-encodeDecodeAutomorph (suc (suc n)) base = refl
-encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!  !}
-encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
-encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
+-- encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
+-- encodeDecodeAutomorph zero base = refl
+-- encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
+--   where lemma : Square refl refl refl (loop (x , p)) 
+--         lemma = ⊥.rec (¬-<-zero p) 
+-- encodeDecodeAutomorph (suc zero) b = refl
+-- encodeDecodeAutomorph (suc (suc n)) base = refl
+-- encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!  !}
+-- encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
+-- encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
 
 
@@ -132,24 +110,32 @@ snd (MyIsomoprhPtdEquiv (suc (suc n))) = refl
 MyIsomorphPtdPath : (n : ℕ) → BouquetStr n ≡ BouquetStr n
 MyIsomorphPtdPath n = pointed-sip (BouquetStr n) (BouquetStr n) (MyIsomoprhPtdEquiv n)
 
-circleHelper : (k : ℕ) →  (n : ℕ) →  S¹ → Bouquet (Fin n)
-circleHelper k zero s = base
-circleHelper k (suc zero) base = base
-circleHelper k (suc zero) (loop i) = loop (zero , ≤-refl) i
-circleHelper zero (suc (suc n)) base = base
-circleHelper zero (suc (suc n)) (loop i) = loop (zero , (suc-≤-suc (≤-suc zero-≤))) i
-circleHelper (suc k) (suc (suc n)) base = base
-circleHelper (suc k) (suc (suc n)) (loop i) = ( {! circleHelper ? ? ? !} ∙ loop (suc k , {!   !})) i
+circleHelper : (k : ℕ) →  (n : ℕ) → (k < n) →  S¹ → Bouquet (Fin n)
+circleHelper k n _ base = base
+circleHelper k zero _ s = base
+circleHelper zero (suc n) _ (loop i) = loop (zero , suc-≤-suc zero-≤) i
+circleHelper (suc k) (suc n) p (loop i) = ( (λ j → circleHelper k (suc n) (suc-< p) (loop j)) ∙ loop (suc k , p )) i
 
--- (circleHelper k (suc (suc n)) (loop i))
 
 circMap : (n : ℕ) →  S¹ → Bouquet (Fin n)
-circMap n s = circleHelper n n s
+circMap zero s = base
+circMap (suc n) s = circleHelper n (suc n) ≤-refl s
 
 -- Defining a circle structure
--- CircleStructure :  Type → Type 
--- CircleStructure A = Σ (n : ℕ) (f : S¹ → Bouquet A) , (f ≡ circMap n)
+TypeWithLoop :  ∀ {ℓ} → Type (ℓ-suc ℓ)
+TypeWithLoop {ℓ} = Σ[ X ∈ Type ℓ ] (S¹ → X)
+--  Σ (n : ℕ) (f : S¹ → Bouquet A) , (f ≡ circMap n)
+
+-- CircleStructure : Type ℓ → Type ℓ
+-- CircleStructure X = Σ[ xX ] (S¹ → X)
 
 
-BouquetCircStr : (n : ℕ) → TypeWithStr _ {!   !}
-BouquetCircStr n = Bouquet (Fin n) , circMap n 
+-- BouquetCircStr : (n : ℕ) → TypeWithStr _ {! CircleStructure  !}
+-- BouquetCircStr n = Bouquet (Fin n) , circMap n 
+
+
+swappy : (k : ℕ) → (n : ℕ) → (k < n) → (Bouquet (Fin n)) → (Bouquet (Fin n))
+swappy k zero p b = base
+swappy k (suc zero) p b = base
+swappy zero (suc (suc n)) p b = automorphGeneral {! suc suc n  !} {!   !}
+swappy (suc k) (suc n) p b = {!   !}
