@@ -215,57 +215,17 @@ R : Tree → RBTree → Type
 R nt rbt = ∀ n → member n nt ≡ memberRB n rbt
 
 -- function from naive tree to red-black tree
--- φ : Tree → RBTree 
--- φ leaf = Empty
--- -- φ (node x leaf leaf) = Node Red Empty x Empty
--- -- φ (node x t1 t2) = insertRB x (mergeRB t1 t2)
--- φ (node x leaf leaf) = insertRB x Empty
--- φ (node x leaf (node x₁ right right₁)) = insertRB x ((φ (node x₁ right right₁ )))
--- φ (node x (node x₁ left left₁) leaf) = insertRB x ((φ (node x₁ left left₁ )))
--- φ (node x (node x₁ left left₁) (node x₂ right right₁)) = insertRB x ( Node _ ((φ (node x₁ left left₁ ))) x ((φ (node x₂ right right₁ )))) 
-
 φ : Tree → RBTree
 φ leaf = Empty
 φ (node x leaf leaf) = Node Red Empty x Empty
 φ (node x t1 t2) = 
     let rb1 = φ t1
         rb2 = φ t2
-    in mergeRB rb1 (insertRB x rb2)
--- φ (node x leaf (node x₁ right right₁)) = insertRB x (Node Red (φ right) x₁ (φ right₁))
--- φ (node x (node x₁ left left₁) leaf) = insertRB x (Node Red (φ left) x₁ (φ left₁))
--- φ (node x (node x₁ left left₁) (node x₂ right right₁)) =
---     let t1 = φ left
---         t2 = φ left₁
---         t3 = φ right
---         t4 = φ right₁
---     in Node Black (Node Black t1 x₁ t2) x (Node Black t3 x₂ t4)
+    in insertRB x (mergeRB rb1 rb2)
 
+-- test example for φ
 aTree : Tree
--- aTree = insert 1 (insert 2 (insert 8 leaf))
 aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5 leaf))))))
-
-get-col : RBTree → Color
-get-col Empty = Black
-get-col (Node col _ _ _) = col
-
-
-get-val : RBTree → ℕ
-get-val Empty = 0
-get-val (Node _ _ val _) = val
-
-
-get-left : RBTree → RBTree
-get-left Empty = Empty
-get-left (Node _ left _ _) = left
-
-
-get-right : RBTree → RBTree
-get-right Empty = Empty
-get-right (Node _ _ _ right) = right
-
-
--- aTree : RBTree
--- aTree = (insertRB 10 (insertRB 9 (insertRB 2 (insertRB 5 (insertRB 8 Empty)))))
 
 
 -- function from red-black tree to naive tree
@@ -276,6 +236,7 @@ get-right (Node _ _ _ right) = right
 ψ (Node color (Node color2 left x₂ left₁) x Empty) = node x (ψ (Node color2 left x₂ left₁)) leaf
 ψ (Node color (Node color3 left x₂ left₁) x (Node x₃ right x₄ right₁)) = node x (ψ (Node color3 left x₂ left₁))  (ψ (Node x₃ right x₄ right₁)) 
 
+-- test example for ψ
 anRBTree : RBTree
 anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
 
