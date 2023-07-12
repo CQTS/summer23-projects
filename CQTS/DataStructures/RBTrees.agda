@@ -79,4 +79,3 @@ module RBTrees where
   RawRBTree : RawBST
   RawRBTree = RBTree , Empty , insertRB , memberRB
 
-  

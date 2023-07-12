@@ -11,7 +11,17 @@ open import CQTS.DataStructures.NaiveBST
 open import CQTS.DataStructures.RBTrees
 open import CQTS.DataStructures
 
+open import Cubical.Relation.ZigZag.Base
 
+open import Cubical.Data.Bool hiding (_≤_; _≟_)
+open import Cubical.Data.Nat
+open import Cubical.Data.Nat.Properties
+open import Cubical.Data.Nat.Order
+open import Cubical.Data.Sigma
+open import Cubical.Data.Empty as ⊥
+open import Cubical.Relation.Nullary
+
+open import Cubical.HITs.PropositionalTruncation
 
 open RBTrees
 open BSTNaiveBST
@@ -48,6 +58,73 @@ aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5
 anRBTree : RBTree
 anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
 
--- ε : ∀ y → R (ψ y) y
--- ε Empty p = refl 
--- ε (Node color l x r) = {!   !} 
+ε' : R (ψ Empty) Empty
+ε' = λ n → refl
+
+helper' : (color : Color) → (left right : RBTree) → (x : ℕ) → (n : ℕ) → member n (ψ (Node color left x right)) ≡ memberRB n (Node color left x right)
+helper' color Empty Empty x n with n ≟ x
+... | lt z = refl
+... | eq z = refl
+... | gt z = refl
+helper' color Empty (Node color₁ right x₂ right₁) x n with n ≟ x
+... | (lt z) = refl
+... | (eq z) = refl
+... | (gt z) = helper' color₁ right right₁ x₂ n
+helper' color (Node color₁ left x₂ left₁) Empty x n with n ≟ x
+... | (lt z) = helper' color₁ left left₁ x₂ n
+... | (eq z) = refl
+... | (gt z) = refl
+helper' color (Node color₁ left x₂ left₁) (Node color₂ right x₄ right₁) x n with n ≟ x
+... | (lt z) = helper' color₁ left left₁ x₂ n
+... | (eq z) = refl
+... | (gt z) = helper' color₂ right right₁ x₄ n
+
+ε'' : (color : Color) → (left right : RBTree) → (x : ℕ) → R (ψ left) left → R (ψ right) right → R (ψ (Node color left x right)) (Node color left x right)
+ε'' color left right x R_left R_right n = helper' color left right x n
+
+ε : ∀ y → R (ψ y) y
+ε Empty = ε'
+ε (Node color left x right) = ε'' color left right x (ε left) (ε right)
+
+helper : (left right : NaiveBST) → (x : ℕ) → (n : ℕ) → member n (node x left right) ≡ memberRB n (φ (node x left right))
+helper t1 leaf x n with n ≟ x
+... | lt y = {!   !}
+... | eq y = {!   !}
+... | gt y = {!   !}
+helper t1 (node x₂ right right₁) x n with n ≟ x
+... | lt y = {!   !}
+... | eq y = {!   !}
+... | gt y = {!   !}
+
+
+η' : (left right : NaiveBST) → (x : ℕ) → R left (φ left) → R right (φ right) → R (node x left right) (φ (node x left right))
+η' left right x R_left R_right = {!  !}
+
+η : ∀ xs → R xs (φ xs)
+η leaf = λ n → refl
+η (node x left right) = η' left right x (η left) (η right)
+
+open isQuasiEquivRel
+
+-- prove that R is a quasi equivalence relation
+QuasiR : QuasiEquivRel NaiveBST RBTree ℓ-zero
+QuasiR .fst .fst = R
+QuasiR .fst .snd a b = isPropΠ λ x → isSetBool (member x a)  (memberRB x b)
+QuasiR .snd .zigzag r r' r'' = λ n → (r n) ∙∙ sym (r' n) ∙∙ (r'' n)
+QuasiR .snd .fwd a = ∣ φ a , η a ∣₁
+QuasiR .snd .bwd b = ∣ ψ b , ε b ∣₁
+
+isStructuredInsert : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
+    → R t rb → R (insert x t) (insertRB x rb)
+isStructuredInsert {t} {rb} x r n = {!   !}
+
+isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
+    → R t rb → member x t ≡ memberRB x rb
+isStructuredMember {t} {rb} x r = r x
+
+-- R itself should be structured
+
+
+
+
+
