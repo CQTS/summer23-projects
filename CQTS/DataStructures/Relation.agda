@@ -123,7 +123,37 @@ isStructuredInsert {leaf} {Empty} x r n | lt z = refl
 isStructuredInsert {leaf} {Empty} x r n | eq z = refl
 isStructuredInsert {leaf} {Empty} x r n | gt z = refl
 isStructuredInsert {leaf} {Node x₁ rb x₂ rb₁} x r n = {!   !}
-isStructuredInsert {node x₁ t t₁} {Empty} x r n = {!   !}
+
+isStructuredInsert {node x₁ t t₁} {Empty} x r n with x ≟ x₁ 
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z with n ≟ x₁
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z | lt z1 with n ≟ x
+isStructuredInsert {node x₁ leaf t₁} {Empty} x r n | lt z | lt z1 | lt z2 with n ≟ x
+isStructuredInsert {node x₁ leaf t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 = refl
+isStructuredInsert {node x₁ leaf t₁} {Empty} x r n | lt z | lt z1 | lt z2 | eq z3 = {!   !}
+isStructuredInsert {node x₁ leaf t₁} {Empty} x r n | lt z | lt z1 | lt z2 | gt z3 = refl
+
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 with x ≟ x₂
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 with n ≟ x₂
+isStructuredInsert {node x₁ (node x₂ leaf t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | lt z4 with n ≟ x
+isStructuredInsert {node x₁ (node x₂ leaf t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | lt z4 | lt z5 = refl
+isStructuredInsert {node x₁ (node x₂ leaf t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | lt z4 | eq z5 = {!   !}
+isStructuredInsert {node x₁ (node x₂ leaf t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | lt z4 | gt z5 = {!   !}
+
+isStructuredInsert {node x₁ (node x₂ (node x₃ t t₃) t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | lt z4 = {!   !}
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | eq z4 = {!   !}
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | lt z3 | gt z4 = {!   !}
+
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | eq z3 = {!   !}
+isStructuredInsert {node x₁ (node x₂ t t₂) t₁} {Empty} x r n | lt z | lt z1 | lt z2 | gt z3 = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z | lt z1 | eq z2 = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z | lt z1 | gt z2 = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z | eq z1 = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | lt z | gt z1 = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | eq z = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n | gt z = {!   !}
+
+
+
 isStructuredInsert {node x₁ t t₁} {Node x₂ rb x₃ rb₁} x r n = {!   !}
 
 isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
