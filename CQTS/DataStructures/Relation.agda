@@ -118,7 +118,13 @@ QuasiR .snd .bwd b = ∣ ψ b , ε b ∣₁
 
 isStructuredInsert : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
     → R t rb → R (insert x t) (insertRB x rb)
-isStructuredInsert {t} {rb} x r n = {!   !}
+isStructuredInsert {leaf} {Empty} x r n with n ≟ x
+isStructuredInsert {leaf} {Empty} x r n | lt z = refl
+isStructuredInsert {leaf} {Empty} x r n | eq z = refl
+isStructuredInsert {leaf} {Empty} x r n | gt z = refl
+isStructuredInsert {leaf} {Node x₁ rb x₂ rb₁} x r n = {!   !}
+isStructuredInsert {node x₁ t t₁} {Empty} x r n = {!   !}
+isStructuredInsert {node x₁ t t₁} {Node x₂ rb x₃ rb₁} x r n = {!   !}
 
 isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
     → R t rb → member x t ≡ memberRB x rb
@@ -130,3 +136,4 @@ isStructuredMember {t} {rb} x r = r x
 
 
 
+ 
