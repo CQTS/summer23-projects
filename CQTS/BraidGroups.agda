@@ -1,8 +1,9 @@
 module CQTS.BraidGroups where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Equiv
-open import Cubical.Foundations.Isomorphism 
+open import Cubical.Foundations.Isomorphism
 open import Cubical.Data.Empty as ⊥
 
 open import Cubical.Algebra.Group
@@ -56,7 +57,7 @@ automorphismGen : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
 automorphismGen zero b = base
 automorphismGen (suc zero) b = b
 automorphismGen (suc (suc n)) base = base
-automorphismGen (suc (suc n)) (loop (zero , p) i) = (loop (zero , suc-≤-suc (≤-suc zero-≤)) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) ∙ sym (loop (zero , suc-≤-suc (≤-suc zero-≤)))) i
+automorphismGen (suc (suc n)) (loop (zero , p) i) = (loop (zero , suc-≤-suc (≤-suc zero-≤)) ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) ∙∙ sym (loop (zero , suc-≤-suc (≤-suc zero-≤)))) i
 automorphismGen (suc (suc n)) (loop (suc zero , p) i) = loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) i
 automorphismGen (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
 
@@ -70,22 +71,86 @@ automorphismGenInv zero b = base
 automorphismGenInv (suc zero) b = b
 automorphismGenInv (suc (suc n)) base = base
 automorphismGenInv (suc (suc n)) (loop (zero , _) i) = loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) i
-automorphismGenInv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )) )) ∙ loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )))) i
+automorphismGenInv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )) )) ∙∙ loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ )))) i
 automorphismGenInv (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
 
--- hardCase : cong automorphismGen n (cong automorphismGen n ())
+hardCase-lemma : ∀ {ℓ} {A : Type ℓ} {x₁ x₂ x₃ x₄ x₅ x₆ : A}
+  {s : x₁ ≡ x₂}
+  {r : x₂ ≡ x₃}
+  {p : x₃ ≡ x₄}
+  {q : x₄ ≡ x₅}
+  {t : x₅ ≡ x₆}
+  →
+  (s ∙ r) ∙∙ p ∙∙ (q ∙ t) ≡ (s ∙∙ (r ∙∙ p ∙∙ q) ∙∙ t)
+hardCase-lemma {A = A} {s = s} {r} {p} {q} {t} i j = hcomp faces (doubleCompPath-filler r p q i j)
+  where faces : I → Partial (j ∨ ~ j) A
+        -- faces k (i = i0) = doubleCompPath-filler (s ∙ r) p (q ∙ t) k j
+        -- faces k (i = i1) = doubleCompPath-filler s (r ∙∙ p ∙∙ q) t k j
+        faces k (j = i0) = compPath-filler s r (~ i) (~ k)
+        faces k (j = i1) = compPath-filler' q t (~ i) k
 
--- encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
--- encodeDecodeAutomorph zero base = refl
--- encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
---   where lemma : Square refl refl refl (loop (x , p)) 
---         lemma = ⊥.rec (¬-<-zero p) 
--- encodeDecodeAutomorph (suc zero) b = refl
--- encodeDecodeAutomorph (suc (suc n)) base = refl
--- encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) = {!  !}
--- encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
--- encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
+hardCase-cancelSides : ∀ {ℓ} {A : Type ℓ} {x₂ x₃ x₄ x₅ : A}
+  (s : x₃ ≡ x₂)
+  (p : x₃ ≡ x₄)
+  (q : x₄ ≡ x₅)
+  →
+  (s ∙ sym s) ∙∙ p ∙∙ (q ∙ sym q) ≡ p
+hardCase-cancelSides {A = A} s p q i j = hcomp faces (p j)
+  where faces : I → Partial (i ∨ j ∨ ~ j) A
+        faces k (i = i1) = p j
+        faces k (j = i0) = rCancel s i (~ k)
+        faces k (j = i1) = rCancel q i k
 
+hardCase : ∀ n p →
+           (λ i → automorphismGenInv (suc (suc n)) (automorphismGen (suc (suc n)) (loop (zero , p) i)))
+           ≡ loop (zero , p)
+hardCase n p =
+  (λ i → automorphismGenInv (suc (suc n)) (automorphismGen (suc (suc n)) (loop (zero , p) i)))
+
+    ≡⟨ refl ⟩
+
+  (λ i → automorphismGenInv (suc (suc n)) ((loop (zero , suc-≤-suc (≤-suc zero-≤))
+                                            ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤))
+                                            ∙∙ (sym (loop (zero , suc-≤-suc (≤-suc zero-≤))))) i))
+
+    ≡⟨ cong-∙∙ (automorphismGenInv (suc (suc n))) (loop (zero , suc-≤-suc (≤-suc zero-≤)))
+                                                  (loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤)))
+                                                  ((sym (loop (zero , suc-≤-suc (≤-suc zero-≤))))) ⟩
+
+  (cong (automorphismGenInv (suc (suc n))) (loop (zero , suc-≤-suc (≤-suc zero-≤)))
+   ∙∙ cong (automorphismGenInv (suc (suc n))) (loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤)))
+   ∙∙ cong (automorphismGenInv (suc (suc n))) ((sym (loop (zero , suc-≤-suc (≤-suc zero-≤))))))
+
+    ≡⟨ refl ⟩
+
+  (loop (suc zero , _)
+   ∙∙ (λ i →    (sym (loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤) ))
+             ∙∙ loop (zero , (suc-≤-suc (≤-suc zero-≤)))
+             ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤))) i)
+   ∙∙ sym (loop (suc zero , _)))
+
+    ≡⟨ sym (hardCase-lemma {s = loop (suc zero , _)}) ⟩
+
+  (loop (suc zero , _) ∙ (sym (loop (suc zero , _))))
+   ∙∙ loop (zero , _)
+   ∙∙ (loop (suc zero , _) ∙ sym (loop (suc zero , _)))
+
+    ≡⟨ hardCase-cancelSides (loop (suc zero , _)) (loop (zero , _)) (loop (suc zero , _)) ⟩
+  loop (zero , suc-≤-suc (≤-suc zero-≤))
+    ≡⟨ (λ i → loop (zero , isProp≤ (suc-≤-suc (≤-suc zero-≤)) p i)) ⟩
+  loop (zero , p)
+  ∎
+
+encodeDecodeAutomorph : (n : ℕ) → (b : Bouquet (Fin n)) → automorphismGenInv n (automorphismGen n b)  ≡ b
+encodeDecodeAutomorph zero base = refl
+encodeDecodeAutomorph zero (loop (x , p) i) j =  lemma i j
+  where lemma : Square refl refl refl (loop (x , p))
+        lemma = ⊥.rec (¬-<-zero p)
+encodeDecodeAutomorph (suc zero) b = refl
+encodeDecodeAutomorph (suc (suc n)) base = refl
+encodeDecodeAutomorph (suc (suc n)) (loop (zero , p) i) j = hardCase n p j i
+encodeDecodeAutomorph (suc (suc n)) (loop (suc zero , p) i) j  = loop (suc zero , isProp≤ (suc-≤-suc (suc-≤-suc (zero-≤ ))) p j) i
+encodeDecodeAutomorph (suc (suc n)) (loop (suc (suc x) , p) i) = refl
 
 
 MyIsomoprh : (n : ℕ) → Iso (Bouquet (Fin n)) (Bouquet (Fin n))
