@@ -160,6 +160,7 @@ isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ)
     → R t rb → member x t ≡ memberRB x rb
 isStructuredMember {t} {rb} x r = r x
 
+
 -- R itself should be structured
 
 
