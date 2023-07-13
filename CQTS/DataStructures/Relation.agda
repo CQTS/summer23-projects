@@ -128,15 +128,8 @@ isStructuredInsert {node x₁ t t₁} {Node x₂ rb x₃ rb₁} x r n = {!   !}
 
 isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ) 
     → R t rb → member x t ≡ memberRB x rb
+isStructuredMember {t} {rb} x r = r x
 
-isStructuredMember {leaf} {Empty} x r = refl
-isStructuredMember {leaf} {Node x₂ rb x₃ rb₁} x r =  {!   !}
-isStructuredMember {node x₁ t t₁} {Empty} x r = {!  !}
--- isStructuredMember {node x₁ t t₁} {Empty} x r = {!   !}
-isStructuredMember {node x₁ t t₁} {Node x₂ rb x₃ rb₁} x r with x ≟ x₁
-... | (lt _) =   {!   !}
-... | (eq _) = {!   !}
-... | (gt _) = {!   !}
 
 -- R itself should be structured
 
