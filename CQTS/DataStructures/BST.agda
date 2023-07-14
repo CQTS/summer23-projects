@@ -48,3 +48,13 @@ module NaiveBST where
   expose leaf = nothing
   expose (node x l r) = just (x , l , r)
 
+  search : (x : ℕ) → SimpleBST → Maybe ℕ
+  search n t = fst (snd (split n t))
+
+
+  insert : (x : ℕ) → SimpleBST → SimpleBST
+  insert x t = 
+    let 
+      (l , _ , r) = split x t
+    in 
+      join (just x) l r
