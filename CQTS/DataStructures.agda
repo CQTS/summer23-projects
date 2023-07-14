@@ -2,6 +2,7 @@ module CQTS.DataStructures where
 
 open import Cubical.Structures.Macro
 open import Cubical.Structures.Axioms
+open import Cubical.Structures.Relational.Auto
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
@@ -32,8 +33,11 @@ private
 module BST-on (A : Type ℓ) (Aset : isSet A) where
 -- Our BST structure has three main components, the empty Tree, an insert function and a member function
 
+  BSTShape : Type ℓ → Type ℓ
+  BSTShape X = X × (A → X → X) × (A → X → Bool)
+
   rawBSTDesc =
-    autoDesc (λ (X : Type ℓ) → X × (A → X → X) × (A → X → Bool)) 
+    autoDesc (λ (X : Type ℓ) → BSTShape X) 
   
   open Macro ℓ rawBSTDesc public renaming
     ( structure to RawBSTStructure
