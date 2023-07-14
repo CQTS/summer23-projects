@@ -45,9 +45,11 @@ module BSTNaiveBST where
   ... | (eq _) = true
   ... | (gt _) = member x r
 
+  NaiveRawStructure : RawBSTStructure NaiveBST
+  NaiveRawStructure = leaf , insert , member
 
-  Raw : RawBST 
-  Raw = NaiveBST , leaf , insert , member
+  Raw : RawBST
+  Raw = NaiveBST , NaiveRawStructure
 
   NaiveWithLaws : BST
   NaiveWithLaws = NaiveBST , S , isSetNaiveBST , emptyNaiveBST , 

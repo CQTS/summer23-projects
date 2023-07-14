@@ -76,6 +76,8 @@ module RBTrees where
   mergeRB t1 Empty = t1
   mergeRB t1 (Node col t2 x t3) = mergeRB (insertRB x (mergeRB t1 t2)) t3
 
-  RawRBTree : RawBST
-  RawRBTree = RBTree , Empty , insertRB , memberRB
+  RBRawStructure : RawBSTStructure RBTree
+  RBRawStructure = Empty , insertRB , memberRB
 
+  RawRBTree : RawBST
+  RawRBTree = RBTree , RBRawStructure

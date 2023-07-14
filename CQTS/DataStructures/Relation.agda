@@ -32,10 +32,6 @@ open BST-on
 
 -- transfer proofs of axioms   
 
--- BSTShape2 : ∀ {ℓ} → Type ℓ → Type ℓ
--- BSTShape2 X = X × (ℕ → X → X) × (ℕ → X → Bool)
--- module S = RelMacro ℓ-zero (autoRelDesc (λ (X : Type ℓ-zero) → BSTShape2 X) )
-
 -- define relation 
 R : NaiveBST → RBTree → Type 
 R nt rbt = ∀ n → member n nt ≡ memberRB n rbt
@@ -212,7 +208,6 @@ isStructuredMember : {t : NaiveBST} {rb : RBTree} (x : ℕ)
     → R t rb → member x t ≡ memberRB x rb
 isStructuredMember {t} {rb} x r = r x
 
-
--- R itself should be structured 
--- isStructuredR : BSTStructure R Raw RawRBTree
--- isStructuredR = {!   !}
+-- R itself should be structured
+isStructuredR : RawBSTRelStr ℕ isSetℕ R NaiveRawStructure RBRawStructure
+isStructuredR = {!!}
