@@ -43,7 +43,7 @@ R nt rbt = ∀ n → member n nt ≡ memberRB n rbt
 -- function from naive tree to red-black tree
 φ : NaiveBST → RBTree
 φ leaf = Empty
-φ (node x leaf leaf) = Node Red Empty x Empty
+-- φ (node x leaf leaf) = Node Red Empty x Empty
 φ (node x t1 t2) = 
     let rb1 = φ t1
         rb2 = φ t2
@@ -68,6 +68,7 @@ anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty)
 
 -- prove relations 
 
+-- rbt to nt
 helper' : (color : Color) → (left right : RBTree) → (x : ℕ) → (n : ℕ) → member n (ψ (Node color left x right)) ≡ memberRB n (Node color left x right)
 helper' color Empty Empty x n with n ≟ x
 ... | lt z = refl
@@ -93,6 +94,69 @@ helper' color (Node color₁ left x₂ left₁) (Node color₂ right x₄ right�
 ε Empty = λ n → refl
 ε (Node color left x right) = ε' color left right x (ε left) (ε right)
 
+
+-- nt to rbt 
+
+-- helper to show balance preserves membership 
+balancePreservesMembership : (clr : Color) (n m : ℕ) (l r : RBTree) → memberRB n (Node clr l m r) ≡ true → memberRB n (balance clr l m r) ≡ true 
+balancePreservesMembership Red n m l r with n ≟ m
+... | (lt x) = λ x → x
+... | (eq x) = λ _ → refl
+... | (gt x) = λ x → x
+balancePreservesMembership Black n m Empty Empty with n ≟ m
+... | (lt x) = λ x → x
+... | (eq x) = λ x → x
+... | (gt x) = λ x → x
+balancePreservesMembership Black n m Empty (Node x r x₁ r₁) with n ≟ m
+... | (lt x) = {! !}
+... | (eq x) = {!   !}
+... | (gt x) = {!   !}
+balancePreservesMembership Black n m (Node x l x₁ l₁) Empty = {!   !}
+balancePreservesMembership Black n m (Node x l x₁ l₁) (Node x₂ r x₃ r₁) = {!   !}
+
+-- helper to show blackenRoot preserves membership 
+blackenRootPreservesMembership :  (n : ℕ) (t : RBTree) → memberRB n t ≡ true → memberRB n (blackenRoot t) ≡ true 
+blackenRootPreservesMembership n Empty = λ i → i
+blackenRootPreservesMembership n (Node x t x₁ t₁) with n ≟ x₁
+... | lt _ = λ i → i
+... | eq _ = λ i → i
+... | gt _ = λ i → i
+
+-- helper to show ins preserves membership 
+insPreservesMembership : (n m : ℕ) (t : RBTree) → memberRB n t ≡ true → memberRB n (ins m t) ≡ true
+insPreservesMembership n m Empty with n ≟ m
+... | (lt x) = λ x → x
+... | (eq x) = {!   !}
+... | (gt x) = λ x → x
+insPreservesMembership n m (Node x t x₁ t₁) = {!   !} 
+
+
+-- helper to show insert preserves membership (axiom 3 for rbt)
+insertRBPreservesMembership :  (n m : ℕ) (t : RBTree) → memberRB n t ≡ true → memberRB n (insertRB m t) ≡ true -- Non-inserted element is not affected
+insertRBPreservesMembership n m Empty with n ≟ m
+... | (lt y) = λ y → y
+... | (eq y) = λ y → refl
+... | (gt y) = λ y → y
+insertRBPreservesMembership n m (Node clr l x r) with m ≟ x  
+insertRBPreservesMembership n m (Node clr l x r) | (lt z) with n ≟ x
+... | (lt y) = {!   !}
+... | (eq y) = {!   !}
+... | (gt y) = {!   !} 
+insertRBPreservesMembership n m (Node clr l x r) | (eq z) with n ≟ x 
+... | (lt y) = λ y → y
+... | (eq y) = λ y → y 
+... | (gt y) = λ y → y 
+insertRBPreservesMembership n m (Node clr l x r) | (gt z) with n ≟ x 
+... | (lt y) = {!   !}
+... | (eq y) = {!   !}
+... | (gt y) = {!   !} 
+
+-- helper to show merge preserves membership 
+mergePreservesMembership : (n : ℕ) (t1 t2  : RBTree) → memberRB n t1 ≡ true → memberRB n (mergeRB t1 t2) ≡ true
+mergePreservesMembership n t1 Empty = λ i → i
+mergePreservesMembership n t1 (Node x t2 x₁ t3) = {!   !}
+
+-- helper to show relation between member and memberRB
 helper : (left right : NaiveBST) → (x : ℕ) → (n : ℕ) → member n (node x left right) ≡ memberRB n (φ (node x left right))
 helper t1 leaf x n with n ≟ x
 ... | lt y = {!   !}
@@ -103,9 +167,26 @@ helper t1 (node x₂ right right₁) x n with n ≟ x
 ... | eq y = {!   !}
 ... | gt y = {!   !}
 
+-- helper leaf leaf x n with n ≟ x
+-- ... | lt y = refl
+-- ... | eq y = refl
+-- ... | gt y = refl
+-- helper leaf (node x₂ right right₁) x n with n ≟ x
+-- ... | lt y = {!    !}
+-- ... | eq y = {!   !}
+-- ... | gt y = {!   !}
+-- helper (node x₂ left left₁) leaf x n with n ≟ x
+-- ... | lt y = {!   !}
+-- ... | eq y = {!   !}
+-- ... | gt y = {!   !}
+-- helper (node x₂ left left₁)  (node x₃ right right₁) x n with n ≟ x
+-- ... | lt y = {!   !}
+-- ... | eq y = {!   !}
+-- ... | gt y = {!   !}
+
 
 η' : (left right : NaiveBST) → (x : ℕ) → R left (φ left) → R right (φ right) → R (node x left right) (φ (node x left right))
-η' left right x R_left R_right = {!  !}
+η' left right x R_left R_right n = helper left right x n
 
 η : ∀ xs → R xs (φ xs)
 η leaf = λ n → refl
