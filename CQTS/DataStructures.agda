@@ -12,6 +12,8 @@ open import Cubical.Foundations.SIP
 open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Structures.Auto
+open import Cubical.Structures.Relational.Auto
+open import Cubical.Structures.Relational.Macro
 
 open import Cubical.Data.Int hiding (sucℤ; _+_)
 open import Cubical.Core.Everything
@@ -33,16 +35,16 @@ private
 module BST-on (A : Type ℓ) (Aset : isSet A) where
 -- Our BST structure has three main components, the empty Tree, an insert function and a member function
 
-  BSTShape : Type ℓ → Type ℓ
-  BSTShape X = X × (A → X → X) × (A → X → Bool)
+  BstShape : Type ℓ → Type ℓ
+  BstShape X = X × (A → X → X) × (A → X → Const[ Bool , isSetBool ])
 
-  rawBSTDesc =
-    autoDesc (λ (X : Type ℓ) → BSTShape X) 
-  
-  open Macro ℓ rawBSTDesc public renaming
+  open RelMacro ℓ (autoRelDesc BstShape) public renaming
     ( structure to RawBSTStructure
     ; equiv to RawBSTEquivStr
     ; univalent to rawBSTUnivalentStr
+    ; relation to RawBSTRelStr
+    ; suitable to rawBSTSuitableRel
+    ; matches to rawBSTMatchesEquiv
     )
 
   RawBST : Type (ℓ-suc ℓ)
