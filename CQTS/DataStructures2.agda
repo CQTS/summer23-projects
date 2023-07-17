@@ -37,14 +37,10 @@ private
 module BST (A : Type ℓ) (Aset : isSet A) where
 -- Our BST structure has three main components an empty tree, a split function and a join function
 
-  data Color : Type ℓ where
-    Red : Color
-    Black : Color
-
   BstShape : Type ℓ → Type ℓ
-  BstShape X = X × (A → X → (X × Maybe (Const[ A , Aset ]) × X)) 
-                 × (Maybe (Const[ A , Aset ]) → X → X → X ) 
-                 × (X → Maybe ((Const[ A , Aset ]) × X × X) )
+  BstShape X = X × (A → X → (X × Maybe (Const[ A , Aset ]) × X))
+                 × (Maybe A → X → X → X)
+                 × (X → Maybe (Const[ A , Aset ] × X × X))
 
 
   open RelMacro ℓ (autoRelDesc BstShape) public renaming
@@ -58,20 +54,14 @@ module BST (A : Type ℓ) (Aset : isSet A) where
 
   module _ {TreeStr : TypeWithStr ℓ RawBSTStructure} where
     Tree = fst TreeStr
-    -- emptyTree : Tree
-    -- emptyTree = fst (snd TreeStr)
-    -- split : A → Tree → (Tree × Maybe A × Tree)
-    -- split = fst (snd (snd TreeStr))
-    -- join : Maybe A → Tree → Tree → Tree
-    -- join =  fst (snd (snd (snd TreeStr)))
-    -- expose : Tree → Maybe (A × Tree × Tree) 
-    -- expose = fst (snd (snd (snd (snd TreeStr)))) 
-    -- Tree , empty , split , join, expose = TreeStr
-    
-    -- search : (x : A) → Tree → Maybe A
-    -- search n t = fst (snd (split n t))
+    emptyTree : Tree
+    emptyTree = fst (snd TreeStr)
+    split : A → Tree → (Tree × Maybe A × Tree)
+    split = fst (snd (snd TreeStr))
+    join : Maybe A → Tree → Tree → Tree
+    join =  fst (snd (snd (snd TreeStr)))
+    expose : Tree → Maybe (A × Tree × Tree)
+    expose = snd (snd (snd (snd TreeStr)))
 
-
-    -- insert : (x : ℕ) → Tree → Tree
-    -- insert x t = {!   !}
- 
+    search : (x : A) → Tree → Maybe A
+    search n t = let (_ , found , _) = split n t in found
