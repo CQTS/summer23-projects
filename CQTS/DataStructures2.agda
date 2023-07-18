@@ -52,16 +52,23 @@ module BST (A : Type ℓ) (Aset : isSet A) where
     ; matches to rawBSTMatchesEquiv
     )
 
-  module _ {TreeStr : TypeWithStr ℓ RawBSTStructure} where
-    Tree = fst TreeStr
-    emptyTree : Tree
-    emptyTree = fst (snd TreeStr)
-    split : A → Tree → (Tree × Maybe A × Tree)
-    split = fst (snd (snd TreeStr))
-    join : Maybe A → Tree → Tree → Tree
-    join =  fst (snd (snd (snd TreeStr)))
-    expose : Tree → Maybe (A × Tree × Tree)
-    expose = snd (snd (snd (snd TreeStr)))
+  -- module _ {TreeStr : TypeWithStr ℓ RawBSTStructure} where
+  --   Tree = fst TreeStr
+  --   emptyTree : Tree
+  --   emptyTree = fst (snd TreeStr)
+  --   split : A → Tree → (Tree × Maybe A × Tree)
+  --   split = fst (snd (snd TreeStr))
+  --   join : Maybe A → Tree → Tree → Tree
+  --   join =  fst (snd (snd (snd TreeStr)))
+  --   expose : Tree → Maybe (A × Tree × Tree)
+  --   expose = snd (snd (snd (snd TreeStr)))
 
-    search : (x : A) → Tree → Maybe A
-    search n t = let (_ , found , _) = split n t in found
+  --   search : (x : A) → Tree → Maybe A
+  --   search n t = let (_ , found , _) = split n t in found
+
+  --   insert : (x : A) → Tree → Tree 
+  --   insert x  t = 
+  --     let 
+  --       (l , _ , r) = split x t
+  --     in 
+  --       join (just x) l r

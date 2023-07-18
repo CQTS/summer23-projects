@@ -58,3 +58,27 @@ module NaiveBST where
       (l , _ , r) = split x t
     in 
       join (just x) l r
+  
+  -- union : (T1 T2 : SimpleBST) → SimpleBST
+  -- union T1 T2 with (expose T1)
+  -- ... | nothing = T2
+  -- ... | just (x , l , r) = 
+  --         let 
+  --           (l2 , x2 , r2) = split x T2
+  --           L = union l l2 
+  --           R = union r r2
+  --         in join (just x) L R
+
+  union : (T1 T2 : SimpleBST) → SimpleBST
+  union leaf leaf = leaf
+  union leaf (node x T2 T3) = node x T2 T3
+  union (node x T1 T2) leaf = node x T1 T2
+  union (node x T1 T2) T3 = join (just x) L R 
+    where 
+      L = union T1 (fst l2)
+        where 
+          l2 = split x T3
+      R = union T2 (fst r2)
+        where 
+          r2 = split x T3
+          
