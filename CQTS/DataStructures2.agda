@@ -52,23 +52,49 @@ module BST (A : Type ℓ) (Aset : isSet A) where
     ; matches to rawBSTMatchesEquiv
     )
 
-  -- module _ {TreeStr : TypeWithStr ℓ RawBSTStructure} where
-  --   Tree = fst TreeStr
-  --   emptyTree : Tree
-  --   emptyTree = fst (snd TreeStr)
-  --   split : A → Tree → (Tree × Maybe A × Tree)
-  --   split = fst (snd (snd TreeStr))
-  --   join : Maybe A → Tree → Tree → Tree
-  --   join =  fst (snd (snd (snd TreeStr)))
-  --   expose : Tree → Maybe (A × Tree × Tree)
-  --   expose = snd (snd (snd (snd TreeStr)))
+  module _ {TreeStr : TypeWithStr ℓ RawBSTStructure} where
+    Tree = fst TreeStr
+    emptyTree : Tree
+    emptyTree = fst (snd TreeStr)
+    split : A → Tree → (Tree × Maybe A × Tree)
+    split = fst (snd (snd TreeStr))
+    join : Maybe A → Tree → Tree → Tree
+    join =  fst (snd (snd (snd TreeStr)))
+    expose : Tree → Maybe (A × Tree × Tree)
+    expose = snd (snd (snd (snd TreeStr)))
 
-  --   search : (x : A) → Tree → Maybe A
-  --   search n t = let (_ , found , _) = split n t in found
+    search : (x : A) → Tree → Maybe A
+    search n t = let (_ , found , _) = split n t in found
 
-  --   insert : (x : A) → Tree → Tree 
-  --   insert x  t = 
-  --     let 
-  --       (l , _ , r) = split x t
-  --     in 
-  --       join (just x) l r
+    insert : (x : A) → Tree → Tree 
+    insert x  t = 
+      let 
+        (l , _ , r) = split x t
+      in 
+        join (just x) l r
+
+    delete : (x : A) → Tree → Tree
+    delete x t = 
+      let 
+        (l , _ , r) = split x t
+      in 
+        join nothing l r
+
+    member : (x : A) → Tree → Bool 
+    member x t with (fst (snd (split x t)))
+    ... | nothing = false
+    ... | just x = true
+
+
+    -- We mark the following functions as TERMINATING because Agda does not know that `expose` and `split` always reduce the size of the tree.
+    {-# TERMINATING #-}
+    union : (T1 T2 : Tree) → Tree
+    union T1 T2 with (expose T1)
+    ... | nothing = T2
+    ... | just (x1 , l1 , r1) = 
+            let 
+              (l2 , x2 , r2) = split x1 T2 
+              L = union l1 l2 
+              R = union r1 r2
+            in join (just x1) L R
+
