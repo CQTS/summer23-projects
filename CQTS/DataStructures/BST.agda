@@ -44,9 +44,9 @@ module NaiveBST where
   joinNaive nothing (node x l r1) r = node x l (joinNaive nothing r1 r)
   joinNaive (just x) l r = node x l r 
 
-  expose_naive : SimpleBST → Maybe ( ℕ × SimpleBST × SimpleBST)
-  expose_naive leaf = nothing
-  expose_naive (node x l r) = just (x , l , r)
+  exposeNaive : SimpleBST → Maybe ( ℕ × SimpleBST × SimpleBST)
+  exposeNaive leaf = nothing
+  exposeNaive (node x l r) = just (x , l , r)
 
   -- search : (x : ℕ) → SimpleBST → Maybe ℕ
   -- search n t = fst (snd (splitNaive n t))
@@ -61,7 +61,7 @@ module NaiveBST where
 
  -- show that simpleBST has a split-join structure
   NaiveRawStructure : RawBSTStructure SimpleBST
-  NaiveRawStructure = leaf , splitNaive , joinNaive , expose_naive 
+  NaiveRawStructure = leaf , splitNaive , joinNaive , exposeNaive 
 
 
           
