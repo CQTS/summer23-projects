@@ -80,15 +80,24 @@ module SplayBST where
   ... | gt _ = secondRotationZigZig (rotateRight (node x₁ (node x₂ (splay left x) left₁) right))
 
 
---   merge : SplayBST → SplayBST → SplayBST 
---   merge leaf right = right
---   merge left leaf = left
---   merge (node x left right) right' = node x left (merge right right') 
+--  join and helper
+  findLargest : SplayBST → ℕ
+  findLargest leaf = 0
+  findLargest (node x left leaf) = x
+  findLargest (node x left (node x₁ right right₁)) = findLargest (node x₁ right right₁)
+  
+  largestItem : SplayBST → ℕ
+  largestItem s = findLargest s
+  
+  -- Helper function to get the tree without its root
+  withoutRoot : SplayBST → SplayBST
+  withoutRoot leaf = leaf
+  withoutRoot (node x left right) = left
 
---   join : Maybe ℕ → SplayBST → SplayBST → SplayBST
---   join Nothing left right = merge left right
---   join (just x) left right = splay (merge left right) x
+  joinSplay : SplayBST → SplayBST → SplayBST
+  joinSplay s t = let newTree = splay s (largestItem s) in node (largestItem newTree) (withoutRoot newTree) t
 
+  -- split and helper
   splitHelper : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
   splitHelper x leaf = leaf , nothing , leaf
   splitHelper x (node k left right) with x ≟ k 
