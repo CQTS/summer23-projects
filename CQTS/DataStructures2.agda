@@ -35,7 +35,7 @@ private
 
 
 module BST (A : Type ℓ) (Aset : isSet A) where
--- Our BST structure has three main components an empty tree, a split function and a join function
+-- Our BST structure has four main components an empty tree, a split function, a join function, and an expose function
 
   BstShape : Type ℓ → Type ℓ
   BstShape X = X × (A → X → (X × Maybe (Const[ A , Aset ]) × X))
@@ -97,4 +97,4 @@ module BST (A : Type ℓ) (Aset : isSet A) where
               L = union l1 l2 
               R = union r1 r2
             in join (just x1) L R
-
+            

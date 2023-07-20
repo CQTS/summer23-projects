@@ -32,32 +32,36 @@ module NaiveBST where
     leaf : SimpleBST 
     node : ℕ → (left : SimpleBST) → (right : SimpleBST) → SimpleBST
 
-  split : (x : ℕ) → SimpleBST → (SimpleBST × Maybe ℕ × SimpleBST)
-  split x leaf = leaf , nothing , leaf
-  split x (node val l r) with x ≟ val
-  ... | lt _ = split x l
+  splitNaive : (x : ℕ) → SimpleBST → (SimpleBST × Maybe ℕ × SimpleBST)
+  splitNaive x leaf = leaf , nothing , leaf
+  splitNaive x (node val l r) with x ≟ val
+  ... | lt _ = splitNaive x l
   ... | eq _ = l , just x , r
-  ... | gt _ = split x r
+  ... | gt _ = splitNaive x r
 
-  join : Maybe ℕ → SimpleBST → SimpleBST → SimpleBST
-  join nothing leaf r = r
-  join nothing (node x l r1) r = node x l (join nothing r1 r)
-  join (just x) l r = node x l r 
+  joinNaive : Maybe ℕ → SimpleBST → SimpleBST → SimpleBST
+  joinNaive nothing leaf r = r
+  joinNaive nothing (node x l r1) r = node x l (joinNaive nothing r1 r)
+  joinNaive (just x) l r = node x l r 
 
-  expose : SimpleBST → Maybe ( ℕ × SimpleBST × SimpleBST)
-  expose leaf = nothing
-  expose (node x l r) = just (x , l , r)
+  exposeNaive : SimpleBST → Maybe ( ℕ × SimpleBST × SimpleBST)
+  exposeNaive leaf = nothing
+  exposeNaive (node x l r) = just (x , l , r)
 
-  search : (x : ℕ) → SimpleBST → Maybe ℕ
-  search n t = fst (snd (split n t))
+  -- search : (x : ℕ) → SimpleBST → Maybe ℕ
+  -- search n t = fst (snd (splitNaive n t))
 
 
-  insert : (x : ℕ) → SimpleBST → SimpleBST
-  insert x t = 
-    let 
-      (l , _ , r) = split x t
-    in 
-      join (just x) l r
-  
+  -- insert : (x : ℕ) → SimpleBST → SimpleBST
+  -- insert x t = 
+  --   let 
+  --     (l , _ , r) = splitNaive x t
+  --   in 
+  --     joinNaive (just x) l r
+
+ -- show that simpleBST has a split-join structure
+  NaiveRawStructure : RawBSTStructure SimpleBST
+  NaiveRawStructure = leaf , splitNaive , joinNaive , exposeNaive 
+
 
           
