@@ -89,7 +89,18 @@ module SplayBST where
 --   join Nothing left right = merge left right
 --   join (just x) left right = splay (merge left right) x
 
+  splitHelper : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
+  splitHelper x leaf = leaf , nothing , leaf
+  splitHelper x (node k left right) with x ≟ k 
+  splitHelper x (node k leaf right) | lt _ = leaf , nothing , (node k leaf right)
+  splitHelper x (node k (node x₁ left left₁) right) | lt _ = let (left' , v , right') = splitHelper x (node x₁ left left₁)
+      in (left' , v , node k right' right)
+  ... | eq _ = left , just k , right
+  splitHelper x (node k left leaf) | gt _ = (node k left leaf) , nothing , leaf
+  splitHelper x (node k left (node x₁ right right₁)) | gt _ = let (left' , v , right') = splitHelper x (node x₁ right right₁)
+      in (node k left left' , v , right')
 
---   split : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
---   split x t = {! !}
- 
+  splitSplay : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
+  splitSplay x t with splay t x
+  ... | leaf = leaf , nothing , leaf
+  ... | (node k left right) = splitHelper x (node k left right)
