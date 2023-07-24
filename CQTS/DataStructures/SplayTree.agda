@@ -127,3 +127,6 @@ module SplayBST where
 
   insertSplay : SplayBST → (x : ℕ) → SplayBST
   insertSplay t x = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
+
+  SplayRawStructure : RawBSTStructure SplayBST
+  SplayRawStructure = leaf , splitSplay , joinSplay , exposeSplay
