@@ -94,8 +94,9 @@ module SplayBST where
   withoutRoot leaf = leaf
   withoutRoot (node x left right) = left
 
-  joinSplay : SplayBST → SplayBST → SplayBST
-  joinSplay s t = let newTree = splay s (largestItem s) in node (largestItem newTree) (withoutRoot newTree) t
+  joinSplay :  Maybe ℕ → SplayBST → SplayBST → SplayBST
+  joinSplay nothing s t = let newTree = splay s (largestItem s) in node (largestItem newTree) (withoutRoot newTree) t
+  joinSplay (just x) s t = node x s t
 
   -- split and helper
   splitHelper : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
@@ -113,3 +114,16 @@ module SplayBST where
   splitSplay x t with splay t x
   ... | leaf = leaf , nothing , leaf
   ... | (node k left right) = splitHelper x (node k left right)
+
+  exposeSplay : SplayBST → Maybe (ℕ × SplayBST × SplayBST)
+  exposeSplay leaf = nothing
+  exposeSplay (node x left right) = just (x , left , right)
+
+  -- searchSplay : SplayBST → (x : ℕ) → Maybe ℕ
+  -- searchSplay t x = let (_ , v , _) = splitSplay x t in v
+
+  searchSplay : SplayBST → (x : ℕ) → Maybe ℕ
+  searchSplay t x =  fst (snd (splitSplay x t)) 
+
+  insertSplay : SplayBST → (x : ℕ) → SplayBST
+  insertSplay t x = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
