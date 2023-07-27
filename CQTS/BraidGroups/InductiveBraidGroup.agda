@@ -1,4 +1,4 @@
-module InductiveBraidGroup where
+module CQTS.BraidGroups.InductiveBraidGroup where
 
 open import Cubical.Foundations.Prelude
 
