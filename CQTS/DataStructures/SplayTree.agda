@@ -125,6 +125,10 @@ module SplayBST where
   searchSplay : SplayBST → (x : ℕ) → Maybe ℕ
   searchSplay t x =  fst (snd (splitSplay x t)) 
 
+  memberSplay : SplayBST → (x : ℕ) → Bool
+  memberSplay t x = case searchSplay t x of λ { nothing → false
+                                              ; (just x) → true }
+
   insertSplay : SplayBST → (x : ℕ) → SplayBST
   insertSplay t x = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
 

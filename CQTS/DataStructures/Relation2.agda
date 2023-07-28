@@ -21,6 +21,7 @@ open import Cubical.Data.Nat
 open import Cubical.Data.Nat.Properties
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sigma
+open import Cubical.Data.Maybe
 open import Cubical.Data.Empty as ⊥
 open import Cubical.Relation.Nullary
 
@@ -34,24 +35,21 @@ open BST
 
 -- define relation 
 R : SimpleBST → SplayBST → Type 
-R nt st = ∀ n → member n nt ≡ member n st
+R nt st = ∀ n → memberNaive nt n ≡ memberSplay st n
 
--- -- function from naive tree to red-black tree
--- φ : NaiveBST → RBTree
--- φ leaf = Empty
--- -- φ (node x leaf leaf) = Node Red Empty x Empty
--- φ (node x t1 t2) = 
---     let rb1 = φ t1
---         rb2 = φ t2
---     in insertRB x (mergeRB rb1 rb2)
+-- function from naive tree to splay tree
+φ : SimpleBST → SplayBST
+φ leaf = leaf
+φ (node x left right) = {!   !}
 
--- -- test example for φ
--- aTree : NaiveBST
--- aTree =  insert 10 (insert 9 ( insert 4 (insert 2 (insert 3 ( insert 7 (insert 5 leaf))))))
+-- test example for φ
+aTree : SimpleBST
+aTree =  insertNaive 10 (insertNaive 9 ( insertNaive 4 (insertNaive 2 (insertNaive 3 ( insertNaive 7 (insertNaive 5 leaf))))))
 
-
--- -- function from red-black tree to naive tree
--- ψ : RBTree → NaiveBST
+-- function from splay tree to naive tree
+ψ : SplayBST → SimpleBST
+ψ leaf = leaf
+ψ (node x left right) = {!   !}
 -- ψ Empty = leaf
 -- ψ (Node color Empty x Empty) = node x leaf leaf
 -- ψ (Node color Empty x (Node color1 right x₂ right₁)) = node x leaf (ψ (Node color1 right x₂ right₁))
