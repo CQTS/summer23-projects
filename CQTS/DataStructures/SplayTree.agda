@@ -129,8 +129,8 @@ module SplayBST where
   memberSplay t x = case searchSplay t x of λ { nothing → false
                                               ; (just x) → true }
 
-  insertSplay : SplayBST → (x : ℕ) → SplayBST
-  insertSplay t x = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
+  insertSplay :  (x : ℕ) → SplayBST → SplayBST
+  insertSplay x t = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
 
   SplayRawStructure : RawBSTStructure SplayBST
   SplayRawStructure = leaf , splitSplay , joinSplay , exposeSplay

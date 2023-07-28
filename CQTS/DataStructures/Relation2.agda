@@ -40,7 +40,7 @@ R nt st = ∀ n → memberNaive nt n ≡ memberSplay st n
 -- function from naive tree to splay tree
 φ : SimpleBST → SplayBST
 φ leaf = leaf
-φ (node x left right) = {!   !}
+φ (node x left right) = {!   !} 
 
 -- test example for φ
 aTree : SimpleBST
@@ -49,16 +49,21 @@ aTree =  insertNaive 10 (insertNaive 9 ( insertNaive 4 (insertNaive 2 (insertNai
 -- function from splay tree to naive tree
 ψ : SplayBST → SimpleBST
 ψ leaf = leaf
-ψ (node x left right) = {!   !}
--- ψ Empty = leaf
--- ψ (Node color Empty x Empty) = node x leaf leaf
--- ψ (Node color Empty x (Node color1 right x₂ right₁)) = node x leaf (ψ (Node color1 right x₂ right₁))
--- ψ (Node color (Node color2 left x₂ left₁) x Empty) = node x (ψ (Node color2 left x₂ left₁)) leaf
--- ψ (Node color (Node color3 left x₂ left₁) x (Node x₃ right x₄ right₁)) = node x (ψ (Node color3 left x₂ left₁))  (ψ (Node x₃ right x₄ right₁)) 
+ψ (node x left right) = node x (ψ left) (ψ right)
 
--- -- test example for ψ
--- anRBTree : RBTree
--- anRBTree = insertRB 22 (insertRB 10 (insertRB 18 ( insertRB 3 (insertRB 7 Empty))))
+-- alternate implementation
+ψ' : SplayBST → SimpleBST
+ψ' leaf = leaf
+ψ' (node x left right) = 
+  let 
+    l = ψ' left
+    r = ψ' right
+  in 
+    insertNaive x (joinNaive nothing l r)
+
+-- test example for ψ
+aSplayTree : SplayBST
+aSplayTree = insertSplay 22 (insertSplay 10 (insertSplay 18 ( insertSplay 3 (insertSplay 7 leaf))))
 
 -- -- prove relations 
 
@@ -123,3 +128,4 @@ aTree =  insertNaive 10 (insertNaive 9 ( insertNaive 4 (insertNaive 2 (insertNai
 -- -- R itself should be structured
 -- isStructuredR : RawBSTRelStr ℕ isSetℕ R NaiveRawStructure RBRawStructure
 -- isStructuredR = {!!}
+ 
