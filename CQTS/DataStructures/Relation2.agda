@@ -40,72 +40,45 @@ R nt st = ∀ n → memberNaive nt n ≡ memberSplay st n
 -- function from naive tree to splay tree
 φ : SimpleBST → SplayBST
 φ leaf = leaf
-φ (node x left right) = {!   !} 
+φ (node x left right) = let 
+    l = φ left
+    r = φ right
+  in 
+    insertSplay x (joinSplay nothing l r) 
 
 -- test example for φ
 aTree : SimpleBST
 aTree =  insertNaive 10 (insertNaive 9 ( insertNaive 4 (insertNaive 2 (insertNaive 3 ( insertNaive 7 (insertNaive 5 leaf))))))
 
--- function from splay tree to naive tree
+-- alternate implementation
 ψ : SplayBST → SimpleBST
 ψ leaf = leaf
-ψ (node x left right) = node x (ψ left) (ψ right)
-
--- alternate implementation
-ψ' : SplayBST → SimpleBST
-ψ' leaf = leaf
-ψ' (node x left right) = 
+ψ (node x left right) = 
   let 
-    l = ψ' left
-    r = ψ' right
+    l = ψ left
+    r = ψ right
   in 
     insertNaive x (joinNaive nothing l r)
 
 -- test example for ψ
 aSplayTree : SplayBST
-aSplayTree = insertSplay 22 (insertSplay 10 (insertSplay 18 ( insertSplay 3 (insertSplay 7 leaf))))
+aSplayTree = insertSplay 15 (insertSplay 22 (insertSplay 10 (insertSplay 18 ( insertSplay 3 (insertSplay 7 leaf)))))
 
--- -- prove relations 
+-- prove relations 
 
--- -- rbt to nt
--- helper' : (color : Color) → (left right : RBTree) → (x : ℕ) → (n : ℕ) → member n (ψ (Node color left x right)) ≡ memberRB n (Node color left x right)
--- helper' color Empty Empty x n with n ≟ x
--- ... | lt z = refl
--- ... | eq z = refl
--- ... | gt z = refl
--- helper' color Empty (Node color₁ right x₂ right₁) x n with n ≟ x
--- ... | (lt z) = refl
--- ... | (eq z) = refl
--- ... | (gt z) = helper' color₁ right right₁ x₂ n
--- helper' color (Node color₁ left x₂ left₁) Empty x n with n ≟ x
--- ... | (lt z) = helper' color₁ left left₁ x₂ n
--- ... | (eq z) = refl
--- ... | (gt z) = refl
--- helper' color (Node color₁ left x₂ left₁) (Node color₂ right x₄ right₁) x n with n ≟ x
--- ... | (lt z) = helper' color₁ left left₁ x₂ n
--- ... | (eq z) = refl
--- ... | (gt z) = helper' color₂ right right₁ x₄ n
+-- splay tree to naive tree
+helper : (left right : SplayBST) → (x : ℕ) → (n : ℕ) → memberNaive (ψ (node x left right)) n ≡ memberSplay (node x left right) n
+helper leaf leaf x n = {!   !}
+helper leaf (node x₁ right right₁) x n = {!   !}
+helper (node x₁ left left₁) leaf x n = {!   !}
+helper (node x₁ left left₁) (node x₂ right right₁) x n = {!   !}
 
--- ε' : (color : Color) → (left right : RBTree) → (x : ℕ) → R (ψ left) left → R (ψ right) right → R (ψ (Node color left x right)) (Node color left x right)
--- ε' color left right x R_left R_right n = helper' color left right x n
+ε' : (x : ℕ) → (left right : SplayBST) → R (ψ left) left → R (ψ right) right → R (ψ (node x left right)) (node x left right)
+ε' x left right R_left R_right n = helper left right x n
 
--- ε : ∀ y → R (ψ y) y
--- ε Empty = λ n → refl
--- ε (Node color left x right) = ε' color left right x (ε left) (ε right)
-
-
--- -- nt to rbt 
-
-
-
--- η' : (left right : NaiveBST) → (x : ℕ) → R left (φ left) → R right (φ right) → R (node x left right) (φ (node x left right))
--- η' left right x R_left R_right n = helper left right x n
-
--- η : ∀ xs → R xs (φ xs)
--- η leaf = λ n → refl
--- η (node x left right) = η' left right x (η left) (η right)
-
-
+ε : ∀ y → R (ψ y) y
+ε leaf = λ n → refl
+ε (node x left right) = ε' x left right (ε left) (ε right)
 
 -- open isQuasiEquivRel
 

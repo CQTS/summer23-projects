@@ -59,8 +59,9 @@ module NaiveBST where
       joinNaive (just x) l r
 
   memberNaive : SimpleBST → (x : ℕ) → Bool
-  memberNaive t x = case searchNaive x t of λ {nothing → false
-                                             ; (just x) → true}
+  memberNaive t x with (fst (snd (splitNaive x t)))
+  ... | nothing = false
+  ... | just x = true
                                              
  -- show that simpleBST has a split-join structure
   NaiveRawStructure : RawBSTStructure SimpleBST

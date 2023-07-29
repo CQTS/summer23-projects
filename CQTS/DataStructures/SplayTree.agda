@@ -119,15 +119,13 @@ module SplayBST where
   exposeSplay leaf = nothing
   exposeSplay (node x left right) = just (x , left , right)
 
-  -- searchSplay : SplayBST → (x : ℕ) → Maybe ℕ
-  -- searchSplay t x = let (_ , v , _) = splitSplay x t in v
-
   searchSplay : SplayBST → (x : ℕ) → Maybe ℕ
   searchSplay t x =  fst (snd (splitSplay x t)) 
 
   memberSplay : SplayBST → (x : ℕ) → Bool
-  memberSplay t x = case searchSplay t x of λ { nothing → false
-                                              ; (just x) → true }
+  memberSplay t x with (fst (snd (splitSplay x t)))
+  ... | nothing = false
+  ... | just x = true
 
   insertSplay :  (x : ℕ) → SplayBST → SplayBST
   insertSplay x t = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
