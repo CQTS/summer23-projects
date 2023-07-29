@@ -159,7 +159,7 @@ auto3 : (n : ℕ) → Bouquet (Fin n) → Bouquet (Fin n)
 auto3 zero b = base
 auto3 (suc zero) b = b
 auto3 (suc (suc n)) base = base
-auto3 (suc (suc n)) (loop (zero , p) i) = (loop (zero , suc-≤-suc (≤-suc zero-≤)) ∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) ∙ sym (loop (zero , suc-≤-suc (≤-suc zero-≤)))) i
+auto3 (suc (suc n)) (loop (zero , p) i) = (loop (zero , suc-≤-suc (≤-suc zero-≤)) ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) ∙∙ sym (loop (zero , suc-≤-suc (≤-suc zero-≤)))) i
 auto3 (suc (suc n)) (loop (suc zero , p) i) = loop (zero , (suc-≤-suc (≤-suc (zero-≤ )))) i
 auto3 (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
 
@@ -168,7 +168,7 @@ auto3Inv zero b = base
 auto3Inv (suc zero) b = b
 auto3Inv (suc (suc n)) base = base
 auto3Inv (suc (suc n)) (loop (zero , _) i) = loop (suc zero , suc-≤-suc (suc-≤-suc (zero-≤ ))) i
-auto3Inv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc(suc-≤-suc(zero-≤)))) ∙ loop (zero , (suc-≤-suc(≤-suc(zero-≤)))) ∙ loop (suc zero , suc-≤-suc(suc-≤-suc(zero-≤)))) i
+auto3Inv (suc (suc n)) (loop (suc zero , p) i) = (sym (loop (suc zero , suc-≤-suc(suc-≤-suc(zero-≤)))) ∙∙ loop (zero , (suc-≤-suc(≤-suc(zero-≤)))) ∙∙ loop (suc zero , suc-≤-suc(suc-≤-suc(zero-≤)))) i
 auto3Inv (suc (suc n)) (loop (suc (suc x) , p) i) = (loop (suc (suc x) , p) i)
 
 hardCase-lemma : ∀ {ℓ} {A : Type ℓ} {x₁ x₂ x₃ x₄ x₅ x₆ : A}
@@ -204,7 +204,7 @@ hardCase : ∀ n p →
 hardCase n p =
   (λ i → auto3Inv (suc (suc n)) (auto3 (suc (suc n)) (loop (zero , p) i)))
 
-    ≡⟨ {!refl!} ⟩
+    ≡⟨ refl ⟩
 
   (λ i → auto3Inv (suc (suc n)) ((loop (zero , suc-≤-suc (≤-suc zero-≤))
                                             ∙∙ loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤))
@@ -218,7 +218,7 @@ hardCase n p =
    ∙∙ cong (auto3Inv (suc (suc n))) (loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤)))
    ∙∙ cong (auto3Inv (suc (suc n))) ((sym (loop (zero , suc-≤-suc (≤-suc zero-≤))))))
 
-    ≡⟨ {!refl!} ⟩
+    ≡⟨ refl ⟩
 
   (loop (suc zero , _)
    ∙∙ (λ i →    (sym (loop (suc zero , suc-≤-suc (suc-≤-suc zero-≤) ))
@@ -487,9 +487,81 @@ productAll zero = refl
 productAll (suc n) = loop (zero , suc-≤-suc zero-≤) ∙ cong (bouquet-map fsuc) (productAll n) -- bouquet-map is the same as bouqueter
 
 ArsProduct : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → cong (Ars r s p) (productAll n) ≡ productAll n
-ArsProduct r (zero , b) p = ⊥.rec (¬-<-zero p)
-ArsProduct (zero , a) (suc s , b) p = {!  !}
-ArsProduct (suc r , a) (suc s , b) p = {!   !}
+ArsProduct {n} r (zero , b) p = ⊥.rec (¬-<-zero p)
+ArsProduct {n} (zero , a) (suc s , b) p = 
+
+        cong (Ars (zero , a) (suc s , b) p) (productAll n)
+
+        ≡⟨ refl ⟩
+
+        cong (conj-constructor (Ars-index (zero , a) (suc s , b) p)) (productAll n)
+
+        ≡⟨ refl ⟩
+
+        {!   !}
+
+        ≡⟨ {!!} ⟩
+
+        {!!}
+
+        ≡⟨ {!!} ⟩
+
+        productAll n
+
+        ∎
+
+ArsProduct {n} (suc r , a) (suc s , b) p = 
+
+        cong (Ars (suc r , a) (suc s , b) p) (productAll n)
+
+        ≡⟨ {!   !} ⟩
+
+        {!   !}
+
+        ≡⟨ {!   !} ⟩
+
+        productAll n
+
+        ∎
 
 proofInv : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → (Ars r s p) ∘ (ArsInv r s p) ≡ idfun _
-proofInv r s p = {!   !}
+proofInv r (zero , b) p = ⊥.rec (¬-<-zero p)
+proofInv {n} (zero , a) (suc s , b) p = 
+
+          Ars (zero , a) (suc s , b) p ∘ ArsInv (zero , a) (suc s , b) p
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (Ars-index (zero , a) (suc s , b) p) ∘ ArsInv (zero , a) (suc s , b) p
+
+          ≡⟨ {!!} ⟩
+
+          conj-constructor (Ars-index (zero , a) (suc s , b) p) ∘ conj-constructor (Ars-index (zero , a) (suc s , b) p)
+
+          ≡⟨ refl ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          idfun (Bouquet (Fin n))
+
+          ∎
+
+proofInv {n} (suc r , a) (suc s , b) p = 
+
+          Ars (suc r , a) (suc s , b) p ∘ ArsInv (suc r , a) (suc s , b) p
+
+          ≡⟨ {!   !} ⟩
+
+          {!   !}
+
+          ≡⟨ {!   !} ⟩
+
+          idfun (Bouquet (Fin n))
+
+          ∎
