@@ -68,8 +68,45 @@ aSplayTree = insertSplay 15 (insertSplay 22 (insertSplay 10 (insertSplay 18 ( in
 
 -- splay tree to naive tree
 helper : (left right : SplayBST) → (x : ℕ) → (n : ℕ) → memberNaive (ψ (node x left right)) n ≡ memberSplay (node x left right) n
-helper leaf leaf x n = {!   !}
+helper leaf leaf x n with n ≟ x 
+helper leaf leaf x n | gt x₁ with x ≟ n
+helper leaf leaf x n | gt x₁ | lt x₂ with n ≟ x
+helper leaf leaf x n | gt x₁ | lt x₂ | lt x₃ = refl
+helper leaf leaf x n | gt x₁ | lt x₂ | eq x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | gt x₁ | lt x₂ | gt x₃ = refl
+helper leaf leaf x n | gt x₁ | eq x₂ with n ≟ x 
+helper leaf leaf x n | gt x₁ | eq x₂ | lt x₃ = refl
+helper leaf leaf x n | gt x₁ | eq x₂ | eq x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | gt x₁ | eq x₂ | gt x₃ = refl
+helper leaf leaf x n | gt x₁ | gt x₂ with n ≟ x
+helper leaf leaf x n | gt x₁ | gt x₂ | lt x₃ = refl
+helper leaf leaf x n | gt x₁ | gt x₂ | eq x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | gt x₁ | gt x₂ | gt x₃ = refl
+helper leaf leaf x n | eq x₁ with x ≟ n 
+helper leaf leaf x n | eq x₁ | lt x₂ with n ≟ x
+helper leaf leaf x n | eq x₁ | lt x₂ | lt x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | eq x₁ | lt x₂ | eq x₃ = refl
+helper leaf leaf x n | eq x₁ | lt x₂ | gt x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | eq x₁ | eq x₂ = {!   !}
+helper leaf leaf x n | eq x₁ | gt x₂ = {!   !}
+helper leaf leaf x n | lt x₁ with x ≟ n  
+helper leaf leaf x n | lt x₁ | gt x₂ with n ≟ x 
+helper leaf leaf x n | lt x₁ | gt x₂ | lt x₃ = refl
+helper leaf leaf x n | lt x₁ | gt x₂ | eq x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | lt x₁ | gt x₂ | gt x₃ = refl
+helper leaf leaf x n | lt x₁ | eq x₂ with n ≟ x
+helper leaf leaf x n | lt x₁ | eq x₂ | lt x₃ = refl
+helper leaf leaf x n | lt x₁ | eq x₂ | eq x₃ = ⊥.rec {!  !}
+helper leaf leaf x n | lt x₁ | eq x₂ | gt x₃ = refl
+helper leaf leaf x n | lt x₁ | lt x₂ with n ≟ x
+helper leaf leaf x n | lt x₁ | lt x₂ | lt x₃ = refl
+helper leaf leaf x n | lt x₁ | lt x₂ | eq x₃ = ⊥.rec {!   !}
+helper leaf leaf x n | lt x₁ | lt x₂ | gt x₃ = refl
+
+
+
 helper leaf (node x₁ right right₁) x n = {!   !}
+
 helper (node x₁ left left₁) leaf x n = {!   !}
 helper (node x₁ left left₁) (node x₂ right right₁) x n = {!   !}
 
