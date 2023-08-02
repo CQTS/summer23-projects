@@ -292,7 +292,7 @@ index1 (suc zero) f = (zero , ≤-suc (≤-suc ≤-refl))
 index1 (suc (suc n)) f = (suc (suc n) , ≤-suc ≤-refl)
 
 deleteZero : {n : ℕ} → (j : Fin (suc n)) → (¬ 0 ≡ fst j) → Fin n
-deleteZero j pr = punchOut {i = (zero , suc-≤-suc zero-≤)} {j = j} ({!!}) --  <→≢ pr
+deleteZero j pr = punchOut {i = (zero , suc-≤-suc zero-≤)} {j = j} {!!}
 
 indexN : (n : ℕ) (m : Fin (suc n)) → Fin (suc (suc n)) → Fin (suc (suc n)) -- we want to swap m and m + 1
 indexN zero (m , _) f = index1 zero f
@@ -326,7 +326,8 @@ auto1newBouq n = bouqueterG (auto1new n)
 -- Here is the old definition of Ars and all of its auxiliary functions and proofs.
 -- All of the new auxiliary functions and proofs will either be in this file (after the commented section) or BraidGroups.Ars
 -- Note that uncommenting the following code does not break anything, it's just full of unnecessary goals that are near impossible to solve for now,
--- which is why they're being rewritten using the new Ars definition. To distinguish between the two version, the older version uses an ' at the end of all names.
+-- which is why they're being rewritten using the new Ars definition.
+-- To distinguish between the two version, the older version uses an ' at the end of all names.
 
 -- Ars-index' : (n : ℕ) (r : Fin (suc (suc n))) (s : Fin (suc (suc n))) → (fst r < fst s) → (i : Fin (suc (suc n))) →  Path (Bouquet (Fin (suc (suc n)))) base base
 -- Ars-index' n (zero , a) (zero , b) p i = ⊥.rec (¬-<-zero p)
@@ -488,17 +489,38 @@ productAll (suc n) = loop (zero , suc-≤-suc zero-≤) ∙ cong (bouquet-map fs
 
 ArsProduct : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → cong (Ars r s p) (productAll n) ≡ productAll n
 ArsProduct {n} r (zero , b) p = ⊥.rec (¬-<-zero p)
-ArsProduct {n} (zero , a) (suc s , b) p = 
+ArsProduct {zero} (zero , a) (suc s , b) p = ⊥.rec (¬-<-zero b)
+ArsProduct {zero} (suc r , a) (suc s , b) p = ⊥.rec (¬-<-zero a)
+ArsProduct {suc zero} (r , a) (suc s , b) p = ⊥.rec (¬-<-zero (pred-≤-pred b))
+ArsProduct {suc (suc n)} (zero , a) (suc zero , b) p = 
 
-        cong (Ars (zero , a) (suc s , b) p) (productAll n)
+        cong (Ars (zero , a) (suc zero , b) p) (productAll (suc (suc n)))
 
         ≡⟨ refl ⟩
 
-        cong (conj-constructor (Ars-index (zero , a) (suc s , b) p)) (productAll n)
+        cong (conj-constructor (Ars-index (zero , a) (suc zero , b) p)) (productAll (suc (suc n)))
 
         ≡⟨ refl ⟩
 
-        {!   !}
+        cong (conj-constructor (A0s-index (suc zero , b) p)) (productAll (suc (suc n)))
+
+        ≡⟨ refl ⟩
+
+        cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (productAll (suc (suc n)))
+
+        -- ≡⟨ refl ⟩
+
+        -- cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)
+        -- ∙ cong (bouquet-map fsuc) (productAll (suc n)))
+
+        -- ≡⟨ cong-∙ (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)) (cong (bouquet-map fsuc) (productAll (suc n))) ⟩
+
+        -- (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)))
+        -- ∙ (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (cong (bouquet-map fsuc) (productAll (suc n))))
+
+        ≡⟨ refl ⟩
+
+        {!!}
 
         ≡⟨ {!!} ⟩
 
@@ -506,37 +528,82 @@ ArsProduct {n} (zero , a) (suc s , b) p =
 
         ≡⟨ {!!} ⟩
 
-        productAll n
+        productAll (suc (suc n))
 
         ∎
 
-ArsProduct {n} (suc r , a) (suc s , b) p = 
+ArsProduct {suc (suc n)} (zero , a) (suc (suc s) , b) p = 
 
-        cong (Ars (suc r , a) (suc s , b) p) (productAll n)
+        cong (Ars (zero , a) (suc (suc s) , b) p) (productAll (suc (suc n)))
 
-        ≡⟨ {!   !} ⟩
+        ≡⟨ refl ⟩
 
-        {!   !}
+        cong (conj-constructor (Ars-index (zero , a) (suc (suc s) , b) p)) (productAll (suc (suc n)))
 
-        ≡⟨ {!   !} ⟩
+        ≡⟨ refl ⟩
 
-        productAll n
+        cong (conj-constructor (A0s-index (suc (suc s) , b) p)) (productAll (suc (suc n)))
+
+        ≡⟨ refl ⟩
+
+        {!!}
+
+        ≡⟨ {!!} ⟩
+
+        {!!}
+
+        ≡⟨ {!!} ⟩
+
+        productAll (suc (suc n))
+
+        ∎
+
+ArsProduct {suc (suc n)} (suc r , a) (suc s , b) p = 
+
+        cong (Ars (suc r , a) (suc s , b) p) (productAll (suc (suc n)))
+
+        ≡⟨ refl ⟩
+
+        cong (conj-constructor (Ars-index (suc r , a) (suc s , b) p)) (productAll (suc (suc n)))
+
+        ≡⟨ refl ⟩
+
+        {!!}
+
+        ≡⟨ {!!} ⟩
+
+        {!!}
+
+        ≡⟨ {!!} ⟩
+
+        productAll (suc (suc n))
 
         ∎
 
 proofInv : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → (Ars r s p) ∘ (ArsInv r s p) ≡ idfun _
 proofInv r (zero , b) p = ⊥.rec (¬-<-zero p)
-proofInv {n} (zero , a) (suc s , b) p = 
+proofInv {zero} (zero , a) (suc s , b) p = ⊥.rec (¬-<-zero b)
+proofInv {zero} (suc r , a) (suc s , b) p = ⊥.rec (¬-<-zero a)
+proofInv {suc zero} (r , a) (suc s , b) p = ⊥.rec (¬-<-zero (pred-≤-pred b))
+proofInv {suc (suc n)} (zero , a) (suc zero , b) p = 
 
-          Ars (zero , a) (suc s , b) p ∘ ArsInv (zero , a) (suc s , b) p
+          Ars (zero , a) (suc zero , b) p ∘ ArsInv (zero , a) (suc zero , b) p
 
           ≡⟨ refl ⟩
 
-          conj-constructor (Ars-index (zero , a) (suc s , b) p) ∘ ArsInv (zero , a) (suc s , b) p
+          conj-constructor (Ars-index (zero , a) (suc zero , b) p) ∘ ArsInv (zero , a) (suc zero , b) p
 
-          ≡⟨ {!!} ⟩
+          ≡⟨ refl ⟩
 
-          conj-constructor (Ars-index (zero , a) (suc s , b) p) ∘ conj-constructor (Ars-index (zero , a) (suc s , b) p)
+          conj-constructor (Ars-index (zero , a) (suc zero , b) p) ∘ conj-constructor (ArsInv-index (zero , a) (suc zero , b) p)
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (A0s-index (suc zero , b) p) ∘ conj-constructor (A0sInv-index (suc zero , b) p)
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤))) ∘ conj-constructor (A01Inv-index (suc-≤-suc (suc-≤-suc zero-≤)))
 
           ≡⟨ refl ⟩
 
@@ -548,20 +615,62 @@ proofInv {n} (zero , a) (suc s , b) p =
 
           ≡⟨ {!!} ⟩
 
-          idfun (Bouquet (Fin n))
+          idfun (Bouquet (Fin (suc (suc n))))
 
           ∎
 
-proofInv {n} (suc r , a) (suc s , b) p = 
+proofInv {suc (suc n)} (zero , a) (suc (suc s) , b) p = 
+
+          Ars (zero , a) (suc (suc s) , b) p ∘ ArsInv (zero , a) (suc (suc s) , b) p
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (Ars-index (zero , a) (suc (suc s) , b) p) ∘ ArsInv (zero , a) (suc (suc s) , b) p
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (Ars-index (zero , a) (suc (suc s) , b) p) ∘ conj-constructor (ArsInv-index (zero , a) (suc (suc s) , b) p)
+
+          ≡⟨ refl ⟩
+
+          conj-constructor (A0s-index (suc (suc s) , b) p) ∘ conj-constructor (A0sInv-index (suc (suc s) , b) p)
+
+          ≡⟨ refl ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          idfun (Bouquet (Fin (suc (suc n))))
+
+          ∎
+
+proofInv {suc (suc n)} (suc r , a) (suc s , b) p = 
 
           Ars (suc r , a) (suc s , b) p ∘ ArsInv (suc r , a) (suc s , b) p
 
-          ≡⟨ {!   !} ⟩
+          ≡⟨ refl ⟩
 
-          {!   !}
+          conj-constructor (Ars-index (suc r , a) (suc s , b) p) ∘ ArsInv (suc r , a) (suc s , b) p
 
-          ≡⟨ {!   !} ⟩
+          ≡⟨ refl ⟩
 
-          idfun (Bouquet (Fin n))
+          conj-constructor (Ars-index (suc r , a) (suc s , b) p) ∘ conj-constructor (ArsInv-index (suc r , a) (suc s , b) p)
+
+          ≡⟨ refl ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          {!!}
+
+          ≡⟨ {!!} ⟩
+
+          idfun (Bouquet (Fin (suc (suc n))))
 
           ∎

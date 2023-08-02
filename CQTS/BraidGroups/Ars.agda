@@ -72,9 +72,8 @@ Ars-index {suc n} (suc r , pr) (suc s , ps) p (suc x , px)
                                        (x , pred-≤-pred px))
 
 -- remaining cases are impossible:
-Ars-index (zero , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
+Ars-index {n} (r , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
 Ars-index {zero} (zero , pr) (suc s , ps) p x = ⊥.rec (¬-<-zero ps)
-Ars-index (suc r , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
 Ars-index {zero} (suc r , pr) (suc s , ps) p x = ⊥.rec (¬-<-zero pr)
 
 Ars : {n : ℕ} → (r s : Fin n) → (fst r < fst s) → Bouquet (Fin n) → Bouquet (Fin n)
@@ -112,9 +111,8 @@ ArsInv-index {suc n} (suc r , pr) (suc s , ps) p (suc x , px)
                                        (x , pred-≤-pred px))
 
 -- remaining cases are impossible:
-ArsInv-index (zero , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
+ArsInv-index {n} (r , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
 ArsInv-index {zero} (zero , pr) (suc s , ps) p x = ⊥.rec (¬-<-zero ps)
-ArsInv-index (suc r , pr) (zero , ps) p x = ⊥.rec (¬-<-zero p)
 ArsInv-index {zero} (suc r , pr) (suc s , ps) p x = ⊥.rec (¬-<-zero pr)
 
 ArsInv : {n : ℕ} → (r s : Fin n) → (fst r < fst s) → Bouquet (Fin n) → Bouquet (Fin n)
