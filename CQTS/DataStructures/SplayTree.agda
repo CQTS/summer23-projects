@@ -102,13 +102,9 @@ module SplayBST where
   splitHelper : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
   splitHelper x leaf = leaf , nothing , leaf
   splitHelper x (node k left right) with x ≟ k 
-  splitHelper x (node k leaf right) | lt _ = leaf , nothing , (node k leaf right)
-  splitHelper x (node k (node x₁ left left₁) right) | lt _ = let (left' , v , right') = splitHelper x (node x₁ left left₁)
-      in (left' , v , node k right' right)
+  ... | lt _ = left , nothing , node k leaf right
   ... | eq _ = left , just k , right
-  splitHelper x (node k left leaf) | gt _ = (node k left leaf) , nothing , leaf
-  splitHelper x (node k left (node x₁ right right₁)) | gt _ = let (left' , v , right') = splitHelper x (node x₁ right right₁)
-      in (node k left left' , v , right')
+  ... | gt _ = node k left leaf , nothing , right
 
   splitSplay : (x : ℕ) → SplayBST → (SplayBST × Maybe ℕ × SplayBST)
   splitSplay x t with splay t x
