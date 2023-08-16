@@ -487,42 +487,43 @@ productAll : (n : ℕ) → Path (Bouquet (Fin n)) base base
 productAll zero = refl
 productAll (suc n) = loop (zero , suc-≤-suc zero-≤) ∙ cong (bouquet-map fsuc) (productAll n) -- bouquet-map is the same as bouqueter
 
-ArsProduct : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → cong (Ars r s p) (productAll n) ≡ productAll n
-ArsProduct {n} r (zero , b) p = ⊥.rec (¬-<-zero p)
-ArsProduct {zero} (zero , a) (suc s , b) p = ⊥.rec (¬-<-zero b)
-ArsProduct {zero} (suc r , a) (suc s , b) p = ⊥.rec (¬-<-zero a)
-ArsProduct {suc zero} (r , a) (suc s , b) p = ⊥.rec (¬-<-zero (pred-≤-pred b))
-ArsProduct {suc (suc n)} (zero , a) (suc zero , b) p = 
+Ars01Product : {n : ℕ} → (p : 1 < n) → cong (Ars (zero , suc-< p) (suc zero , p) ≤-refl) (productAll n) ≡ productAll n
+Ars01Product {zero} p = ⊥.rec (¬-<-zero p)
+Ars01Product {suc zero} p = ⊥.rec ((¬m<m p))
+Ars01Product {suc (suc n)} p =
 
-        cong (Ars (zero , a) (suc zero , b) p) (productAll (suc (suc n)))
+        cong (Ars (zero , suc-≤-suc zero-≤) (suc zero , suc-≤-suc (suc-≤-suc zero-≤)) ≤-refl) (productAll (suc (suc n)))
 
         ≡⟨ refl ⟩
 
-        cong (conj-constructor (Ars-index (zero , a) (suc zero , b) p)) (productAll (suc (suc n)))
+        cong (conj-constructor (Ars-index (zero , suc-≤-suc zero-≤) (suc zero , suc-≤-suc (suc-≤-suc zero-≤)) ≤-refl)) (productAll (suc (suc n)))
 
         ≡⟨ refl ⟩
 
-        cong (conj-constructor (A0s-index (suc zero , b) p)) (productAll (suc (suc n)))
+        cong (conj-constructor (A0s-index (suc zero , suc-≤-suc (suc-≤-suc zero-≤)) ≤-refl)) (productAll (suc (suc n)))
 
         ≡⟨ refl ⟩
 
         cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (productAll (suc (suc n)))
 
-        -- ≡⟨ refl ⟩
+        ≡⟨ refl ⟩
 
-        -- cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)
-        -- ∙ cong (bouquet-map fsuc) (productAll (suc n)))
+        cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤) ∙ cong (bouquet-map fsuc) (productAll (suc n)))
 
-        -- ≡⟨ cong-∙ (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)) (cong (bouquet-map fsuc) (productAll (suc n))) ⟩
+        ≡⟨ cong-∙ (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)) (cong (bouquet-map fsuc) (productAll (suc n))) ⟩
 
-        -- (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤)))
-        -- ∙ (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (cong (bouquet-map fsuc) (productAll (suc n))))
+        (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (loop (zero , suc-≤-suc zero-≤))) ∙ (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (cong (bouquet-map fsuc) (productAll (suc n))))
 
         ≡⟨ refl ⟩
 
-        {!!}
+        (λ i → conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤))) (loop (zero , suc-≤-suc zero-≤) i)) ∙ (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (cong (bouquet-map fsuc) (productAll (suc n))))
 
         ≡⟨ {!!} ⟩
+
+        {!λ i → (A01-index (suc-≤-suc (suc-≤-suc zero-≤)) (loop (zero , suc-≤-suc zero-≤) i)) ∙ (loop (zero , suc-≤-suc zero-≤) i) ∙ sym (A01-index (suc-≤-suc (suc-≤-suc zero-≤)) (loop (zero , suc-≤-suc zero-≤) i))!} -- λ i → loop (0 , ?) ∙ loop (1 , ?) ∙ ? ∙ sym (loop (0 , ?) ∙ loop (1 , ?)) i
+        ∙ (cong (conj-constructor (A01-index (suc-≤-suc (suc-≤-suc zero-≤)))) (cong (bouquet-map fsuc) (productAll (suc n))))
+
+        ≡⟨ refl ⟩
 
         {!!}
 
@@ -532,6 +533,15 @@ ArsProduct {suc (suc n)} (zero , a) (suc zero , b) p =
 
         ∎
 
+Ars0sProduct : {n : ℕ} (s : Fin n) → (m : 1 < n) → (p : 0 < fst s) → cong (Ars (zero , suc-< m) (fst s , {!!}) p) (productAll n) ≡ productAll n
+Ars0sProduct {n} s m p = {!!}
+
+ArsProduct : {n : ℕ} → (r s : Fin n) → (p : fst r < fst s) → cong (Ars r s p) (productAll n) ≡ productAll n
+ArsProduct {n} r (zero , b) p = ⊥.rec (¬-<-zero p)
+ArsProduct {zero} (zero , a) (suc s , b) p = ⊥.rec (¬-<-zero b)
+ArsProduct {zero} (suc r , a) (suc s , b) p = ⊥.rec (¬-<-zero a)
+ArsProduct {suc zero} (r , a) (suc s , b) p = ⊥.rec (¬-<-zero (pred-≤-pred b))
+ArsProduct {suc (suc n)} (zero , a) (suc zero , b) p = Ars01Product b
 ArsProduct {suc (suc n)} (zero , a) (suc (suc s) , b) p = 
 
         cong (Ars (zero , a) (suc (suc s) , b) p) (productAll (suc (suc n)))

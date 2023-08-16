@@ -30,7 +30,7 @@ bouquet-map f (loop x i) = loop (f x) i
 -- This is `fsuc`, but keeping `zero` at `zero`.
 fstretch : ∀ {n} → Fin (suc n) → Fin (suc (suc n))
 fstretch (zero , p) = (zero , ≤-suc p)
-fstretch n = fsuc n
+fstretch (suc n , x) = fsuc (suc n , x) -- this was previously fstretch n = fsuc n but I believe this is more correct. revert it to the previous one if I'm wrong
 
 -- bouquet-suc : ∀ {n} → (Bouquet (Fin n)) → (Bouquet (Fin (suc n)))
 -- bouquet-suc base = base
