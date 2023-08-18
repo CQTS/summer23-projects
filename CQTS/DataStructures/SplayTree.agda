@@ -122,9 +122,130 @@ module SplayBST where
   memberSplay t x with (fst (snd (splitSplay x t)))
   ... | nothing = false
   ... | just x = true
+  
+  naiveMember : (x : ℕ) → SplayBST → Bool
+  naiveMember x leaf = false
+  naiveMember x (node y l r) with x ≟ y
+  ... | (lt _) = naiveMember x l
+  ... | (eq _) = true
+  ... | (gt _) = naiveMember x r
+
+  splayLemma : (t : SplayBST) → (x : ℕ) → (n : ℕ) → naiveMember n t ≡ naiveMember n (splay t x)
+  splayLemma leaf x n = refl
+  splayLemma (node y l r) x n with x ≟ y
+  splayLemma (node y l r) x n | (lt _) with y ≟ x 
+  splayLemma (node y l r) x n | (lt _) | (lt _) with n ≟ y 
+  splayLemma (node y l leaf) x n | lt _ | lt _ | lt _ with n ≟ y
+  splayLemma (node y l leaf) x n | lt _ | lt _ | lt _ | lt _ = refl
+  splayLemma (node y l leaf) x n | lt _ | lt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | lt _ with x₁ ≟ x 
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ with n ≟ x₁ 
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | lt _ with n ≟ y 
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | lt _ | lt _ = refl
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ with x₂ ≟ x 
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ with n ≟ x₂
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ with n ≟ x₁ 
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | lt _ with n ≟ y 
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | lt _ | lt _ = refl
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | eq _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | lt _ | eq _ with n ≟ x₁
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | lt _ | eq _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | lt _ | eq _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | lt _ | eq _ | gt _ = {!  !}
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ with n ≟ x₁ 
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | lt _ with n ≟ y
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | lt _ | lt _ = refl
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ leaf r₁)) x n | lt _ | lt _ | lt _ | gt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ with x₂ ≟ x 
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ with n ≟ x₂
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | lt _ with n ≟ y
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | lt _ | lt _ = refl
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | eq _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ (node x₂ r r₂) r₁)) x n | lt _ | lt _ | lt _ | gt _ | gt _ = {!   !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | eq _ with n ≟ y 
+  splayLemma (node y l leaf) x n | lt _ | lt _ | eq _ | lt _ = {!  !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | eq _ | eq _ = refl
+  splayLemma (node y l leaf) x n | lt _ | lt _ | eq _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ with x₁ ≟ x
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ with n ≟ x₁ 
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | lt _ with n ≟ y
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | lt _ | eq _ = refl
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | eq _ = refl
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | eq _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | eq _ | lt _ with x₂ ≟ x 
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | eq _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | eq _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | eq _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ with n ≟ x₁ 
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | lt _ with n ≟ y 
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | lt _ | eq _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | eq _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | eq _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | eq _ | gt _ = {!   !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | gt _ with  n ≟ y 
+  splayLemma (node y l leaf) x n | lt _ | lt _ | gt _ | lt _ = {!   !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | gt _ | eq _ = {!   !}
+  splayLemma (node y l leaf) x n | lt _ | lt _ | gt _ | gt _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ with x₁ ≟ x 
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | lt _ with n ≟ x₁
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ with n ≟ x₁
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | lt _ with n ≟ y 
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r leaf)) x n | lt _ | lt _ | gt _ | lt _ | gt _ | gt _ = refl
+  splayLemma (node y l (node x₁ r (node x₂ r₁ r₂))) x n | lt _ | lt _ | gt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ with n ≟ x₁
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | lt _ with n ≟ y 
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | lt _ | lt _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | lt _ | eq _ = {!   !}
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | lt _ | gt _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | eq _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | eq _ | gt _ = refl
+  splayLemma (node y l (node x₁ r r₁)) x n | lt _ | lt _ | gt _ | gt _ = {!   !}
+  splayLemma (node y l r) x n | (lt _) | (eq _) with n ≟ y
+  splayLemma (node y l r) x n | (lt _) | (eq _) | lt _ = refl
+  splayLemma (node y l r) x n | (lt _) | (eq _) | eq _ = refl
+  splayLemma (node y l r) x n | (lt _) | (eq _) | gt _ = refl
+  splayLemma (node y l r) x n | (lt _) | (gt _) with n ≟ y 
+  splayLemma (node y leaf r) x n | lt _ | gt _ | lt _ with n ≟ y
+  splayLemma (node y leaf r) x n | lt _ | gt _ | lt _ | lt _ = refl
+  splayLemma (node y leaf r) x n | lt _ | gt _ | lt _ | eq _ = {!   !}
+  splayLemma (node y leaf r) x n | lt _ | gt _ | lt _ | gt _ = {!   !}
+  splayLemma (node y (node x₁ l l₁) r) x n | lt _ | gt _ | lt _ = {!   !}
+  splayLemma (node y l r) x n | (lt _) | (gt _) | eq _ = {!   !}
+  splayLemma (node y l r) x n | (lt _) | (gt _) | gt _ = {!   !}
+  splayLemma (node y l r) x n | (eq _) = {!   !}
+  splayLemma (node y l r) x n | (gt _) = {!   !}
 
   insertSplay :  (x : ℕ) → SplayBST → SplayBST
   insertSplay x t = let (l , _ , r) = splitSplay x t in joinSplay (just x) l r
 
   SplayRawStructure : RawBSTStructure SplayBST
-  SplayRawStructure = leaf , splitSplay , joinSplay , exposeSplay
+  SplayRawStructure = leaf , splitSplay , joinSplay , exposeSplay 
